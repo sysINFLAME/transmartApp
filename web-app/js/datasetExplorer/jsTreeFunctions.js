@@ -503,6 +503,7 @@ function preDropOntoCategorySelectionCrossTrial(droppedNodeData)
     return true;
 }
 
+
 ////////////////////////////
 //These are the jQuery versions of these functions
 //This function fires when an item is dropped onto an input box.

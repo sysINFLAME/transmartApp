@@ -33,7 +33,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // you can remove whichever you're not using
         runtime 'org.postgresql:postgresql:9.3-1100-jdbc4'
-        runtime 'com.oracle:ojdbc7:12.1.0.1'
+        //runtime 'com.oracle:ojdbc7:12.1.0.1'
 
         compile 'org.transmartproject:transmart-core-api:1.2.0'
         compile 'antlr:antlr:2.7.7'
@@ -80,7 +80,7 @@ grails.project.dependency.resolution = {
         compile ':build-info:1.2.5'
         compile ':hibernate:3.6.10.7'
         compile ':quartz:1.0-RC2'
-        compile ':rdc-rmodules:1.2.0'
+        //compile ':rdc-rmodules:1.2.0'
         // Not compatible with spring security 3.2 yet
         //compile ':spring-security-kerberos:0.1'
         compile ':spring-security-ldap:2.0-RC2'

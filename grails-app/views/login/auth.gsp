@@ -31,7 +31,11 @@
 }
 
 .disclaimer {
+<<<<<<< HEAD
 	font-size: 16px;
+=======
+	font-size: 18px;
+>>>>>>> branch 'sysinflame' of https://github.com/baumjamin/transmartApp.git
 	color: red;
 	font-weight: bold;
 }
@@ -278,7 +282,6 @@
 												reproduced in another laboratory."</td>
 										</tr>
 -->
-
 									</table>
 								</div>
 							</div>

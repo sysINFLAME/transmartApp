@@ -54,7 +54,6 @@ grails.project.dependency.resolution = {
     dependencies {
         // you can remove whichever you're not using
         runtime 'org.postgresql:postgresql:9.3-1100-jdbc4'
-        runtime 'com.oracle:ojdbc7:12.1.0.1'
 
         runtime 'org.javassist:javassist:3.16.1-GA'
 
@@ -127,7 +126,7 @@ grails.project.dependency.resolution = {
         compile ":codenarc:0.21"
 
         if (!dm) {
-            compile ':rdc-rmodules:1.2.4'
+//            compile ':rdc-rmodules:1.2.4'
             runtime ':transmart-core:1.2.4'
             compile ':transmart-gwas:1.2.4'
             //// already included in transmart-gwas
@@ -147,7 +146,7 @@ grails.project.dependency.resolution = {
             runtime ':blend4j-plugin:1.2.4'
             runtime ':transmart-metacore-plugin:1.2.4'
 
-            test ':transmart-core-db-tests:1.2.4'
+//            test ':transmart-core-db-tests:1.2.4'
         } else {
             dm.internalDependencies delegate
         }
@@ -158,7 +157,7 @@ grails.project.dependency.resolution = {
 }
 
 dm?.with {
-    configureInternalPlugin 'compile', 'rdc-rmodules'
+//    configureInternalPlugin 'compile', 'rdc-rmodules'
     configureInternalPlugin 'runtime', 'transmart-core'
     configureInternalPlugin 'test', 'transmart-core-db-tests'
     configureInternalPlugin 'compile', 'transmart-gwas'
@@ -192,6 +191,52 @@ codenarc.reports = {
         outputFile = 'CodeNarc-transmartApp-Report.html'
         title = 'transmartApp Report'
     }
+}
+def buildConfigFile = new File("${userHome}/.grails/${appName}Config/" +
+	"BuildConfig.groovy")
+if (buildConfigFile.exists()) {
+println "Processing external build config at $buildConfigFile"
+
+def slurpedBuildConfig = new ConfigSlurper(Environment.current.name).
+		parse(buildConfigFile.toURL())
+
+/* For development, it's interesting to use the plugins in-place.
+ * This allows the developer to put the grails.plugin.location.* assignments
+ * in an out-of-tree BuildConfig file if they want to.
+ * Snippet from https://gist.github.com/acreeger/910438
+ */
+slurpedBuildConfig.grails.plugin.location.each { String k, v ->
+	if (!new File(v).exists()) {
+		println "WARNING: Cannot load in-place plugin from ${v} as that " +
+				"directory does not exist."
+	} else {
+		println "Loading in-place plugin $k from $v"
+		grails.plugin.location."$k" = v
+	}
+	if (grailsSettings.projectPluginsDir?.exists()) {
+		grailsSettings.projectPluginsDir.eachDir { dir ->
+			// remove optional version from inline definition
+			def dirPrefix = k.replaceFirst(/:.+/, '') + '-'
+			if (dir.name.startsWith(dirPrefix)) {
+				println "WARNING: Found a plugin directory at $dir that is a " +
+						"possible conflict and may prevent grails from using " +
+						"the in-place $k plugin."
+			}
+		}
+	}
+}
+
+/* dependency resolution in external BuildConfig */
+Closure originalDepRes = grails.project.dependency.resolution;
+if (slurpedBuildConfig.grails.project.dependency.resolution) {
+	Closure extraDepRes = slurpedBuildConfig.grails.project.dependency.resolution;
+	grails.project.dependency.resolution = {
+		originalDepRes.delegate        = extraDepRes.delegate        = delegate
+		originalDepRes.resolveStrategy = extraDepRes.resolveStrategy = resolveStrategy
+		originalDepRes.call(it)
+		extraDepRes.call(it)
+	}
+}
 }
 
 // vim: set et ts=4 sw=4:

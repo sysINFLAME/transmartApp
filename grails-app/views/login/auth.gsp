@@ -182,5 +182,104 @@
             </td>
         </tr>
     </table>
+    <!-- SysINFLAME DISCLAIMER -->
+	<div align="center"
+		style="clear: both; margin-left: auto; margin-right: auto; margin-top: 20px; text-align: center">
+		<table
+			style="width: auto; border: 0px; text-align: center; margin: auto;"
+			align="center">
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan=2 valign="middle"
+					style="text-align: center; vertical-align: middle; border: 1px; font-size: 11px"
+					nowrap="nowrap">
+					<div style="margin-right: auto; margin-left: auto; width: 700px;">
+						<div class="x-box-tl">
+							<div class="x-box-tr">
+								<div class="x-box-tc"></div>
+							</div>
+						</div>
+						<div class="x-box-ml">
+							<div class="x-box-mr">
+								<div class="x-box-mc" style="text-align: left">
+									<table
+										style="border: 0px; text-align: center; width: 600px; color: red">
+										<tr>
+											<td class='disclaimer' colspan="2">DISCLAIMER</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td colspan="2" class='sysinflame'>By logging in to this
+												application I acknowledge that, according to the <a
+												href="http://www.dfg.de/download/pdf/dfg_im_profil/reden_stellungnahmen/download/empfehlung_wiss_praxis_1310.pdf"
+												target="_blank"
+												style="color: blue; text-decoration: underline">DFG-Memorandum
+													on Safeguarding Good Scientific Practice</a>, I am obliged to
+												ensure good scientific practice by consulting a (bio)medical
+												informaticist (data management) and a statistician or
+												epidemiologist (analysis) prior to publishing any results
+												obtained (partly or in full) through the use of this
+												application. 
+
+											</td>
+										<tr>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td class='sysinflame' colspan="2" style="color: red">
+												Noncompliance could lead to a severe lack in
+												reproducibility and may constitute a case of scientific
+												misconduct.</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+										</tr>
+										<!--  
+										<tr>
+											<td class='sysinflame' colspan="2" style="font-weight: bold">
+												Recommendation 7: Safeguarding and Storing of Primary Data
+												Primary data as the basis for publications shall be securely
+												stored for ten years in a durable form in the institution of
+												their origin.</td>
+
+										</tr>
+										<tr>
+											<td class='sysinflame' colspan="2">"A scientific finding
+												normally is a complex product of many single working steps.
+												In all experimental sciences, the results reported in
+												publications are generated through individual observations
+												or measurements adding up to preliminary findings.
+												Observation and experiment, as well as numerical calculation
+												(used as an independent method or to support data analysis),
+												first produce "data". […] Experiments and numerical
+												calculations can only be repeated if all important steps are
+												reproducible. For this purpose, they must be recorded. Every
+												publication based on experiments or numerical simulations
+												includes an obligatory chapter on "materials and methods"
+												summing up these records in such a way that the work may be
+												reproduced in another laboratory."</td>
+										</tr>
+-->
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="x-box-bl">
+							<div class="x-box-br">
+								<div class="x-box-bc"></div>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
 </body>

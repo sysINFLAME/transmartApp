@@ -182,7 +182,7 @@ com.recomdata.analysis.data.file.dir = "data"; // Relative to the app root "web-
 
 // Disclaimer
 StringBuilder disclaimer = new StringBuilder()
-disclaimer.append("<p></p>")
+disclaimer.append("<p>DISCLAIMER</p>")
 com.recomdata.disclaimer = disclaimer.toString()
 
 // customization views
@@ -201,8 +201,8 @@ grails.plugins.sendfile.tomcat = false
 grails.plugin.springsecurity.useSecurityEventListener = true
 
 bruteForceLoginLock {
-    allowedNumberOfAttempts = 3
-    lockTimeInMinutes = 10
+    allowedNumberOfAttempts = 300
+    lockTimeInMinutes = 1
 }
 
 log4j = {
@@ -219,7 +219,12 @@ log4j = {
         }
     }
 }
-
+ui.tabs.browse.hide = true
+ui.tabs.search.show = true
+ui.tabs.sampleExplorer.hide = true
+ui.tabs.geneSignature.hide = true
+ui.tabs.gwas.hide = true
+ui.tabs.uploadData.hide = true
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
 /* remove this line

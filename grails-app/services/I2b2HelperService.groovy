@@ -55,7 +55,7 @@ class I2b2HelperService {
         String sqlt = """SELECT """ + col + """ FROM patient_dimension f WHERE
 		    PATIENT_NUM IN (select distinct patient_num
 			from qt_patient_set_collection
-			where result_instance_id = ?)""";
+			where result_instance_id = ?::numeric)""";
         sql.eachRow(sqlt, [result_instance_id], { row ->
             values.add(row[0])
         });

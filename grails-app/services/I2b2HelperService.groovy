@@ -57,7 +57,9 @@ class I2b2HelperService {
 			from qt_patient_set_collection
 			where result_instance_id = ?::numeric)""";
         sql.eachRow(sqlt, [result_instance_id], { row ->
-            values.add(row[0])
+            if (row[0] == null)
+				row[0] = 0
+			values.add(row[0])
         });
         double[] returnvalues = new double[values.size()];
         for (int i = 0; i < values.size(); i++) {

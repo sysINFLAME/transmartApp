@@ -77,7 +77,7 @@ public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
             def user = AuthUser.findByUsername(username)
             def create = false
             def message
-
+			
             if (!user) {
                 create = true
                 def sql = new Sql(dataSource)
@@ -115,14 +115,14 @@ public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
                 authority.addAll(authorities)
             } else
                 authority = authorities
-
+				println "AUTHORITY: " + authority
             return new AuthUserDetails(
                     user.username,
                     user.passwd,
                     user.enabled,
                     true,
                     true,
-                    !loginAttemptCacheService.isLocked(user.username),
+                    true, //!loginAttemptCacheService.isLocked(user.username), //true
                     authority ?: AuthUserDetailsService.NO_ROLES,
                     user.id,
                     "LDAP '${user.userRealName}'")

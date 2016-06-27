@@ -519,7 +519,11 @@ li.x-tab-strip-active {
 }
 
 .x-panel-body {
-	border: none;
+       border: none;
+       background-image:url(http://www.med.uni-goettingen.de/de/images/logos/cd_umg_rgb_small.jpg) !important;
+       background-repeat: no-repeat !important;
+    background-position: 95% 95% !important;
+    background-attachment: fixed !important;
 }
 
 .x-tab-panel-body {

@@ -520,7 +520,7 @@ li.x-tab-strip-active {
 
 .x-panel-body {
        border: none;
-       background-image:url(http://www.med.uni-goettingen.de/de/images/logos/cd_umg_rgb_small.jpg) !important;
+       background-image:url('../images/local_logo.jpg') !important;
        background-repeat: no-repeat !important;
     background-position: 95% 95% !important;
     background-attachment: fixed !important;

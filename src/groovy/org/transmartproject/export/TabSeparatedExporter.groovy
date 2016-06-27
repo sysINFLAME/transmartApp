@@ -88,7 +88,7 @@ class TabSeparatedExporter implements HighDimExporter {
             List<AssayColumn> assayList = tabularResult.indicesList
 
             // Start looping 
-            for (DataRow<AssayColumn, Map<String, String>> datarow : tabularResult) {
+            for (DataRow<AssayColumn, Object> datarow : tabularResult) {
                 // Test periodically if the export is cancelled
                 if (isCancelled()) {
                     return null
@@ -96,7 +96,7 @@ class TabSeparatedExporter implements HighDimExporter {
 
                 for (AssayColumn assay : assayList) {
                     // Retrieve data for the current assay from the datarow
-                    Map<String, String> data = datarow[assay]
+                    def data = datarow[assay]
 
                     if (data == null) {
                         continue
@@ -104,13 +104,7 @@ class TabSeparatedExporter implements HighDimExporter {
 
                     // Add values for default columns
                     List<String> line = [
-                            assay.patientInTrialId,
-                            assay.sampleType.label,
-                            assay.timepoint.label,
-                            assay.tissueType.label,
-                            assay.platform.id,
                             assay.id,
-                            assay.sampleCode
                     ]
 
                     // Return data for this specific assay
@@ -139,13 +133,7 @@ class TabSeparatedExporter implements HighDimExporter {
      */
     protected List<String> createHeader(List additionalHeaderFields) {
         [
-                "PATIENT ID",
-                "SAMPLE TYPE",
-                "TIMEPOINT",
-                "TISSUE TYPE",
-                "GPL ID",
-                "ASSAY ID",
-                "SAMPLE CODE"
+                "Assay ID",
         ] + (additionalHeaderFields ?: [])
     }
 

@@ -1,6 +1,5 @@
 import grails.util.Environment
 
-
 def console
 if (!Environment.isWarDeployed() && Environment.isWithinShell()) {
     console = grails.build.logging.GrailsConsole.instance
@@ -64,11 +63,7 @@ if (externalDataSource) {
 }
 grails.config.locations.each { console.info "Including configuration file [${it}] in configuration building." }
 
-/*
- *  The following lines are copied from the previous COnfig.groovy
- *
- */
-
+grails.mime.disable.accept.header.userAgents = []
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.types = [html         : [
         'text/html',
@@ -206,6 +201,38 @@ bruteForceLoginLock {
 }
 
 log4j = {
+    /**
+     * Configuration for writing audit metrics.
+     * This needs to be placed in the out-of-tree Config.groovy, as the log4j config there will override this.
+     * (and don't forget to 'import org.apache.log4j.DailyRollingFileAppender',
+     * 'import org.transmart.logging.ChildProcessAppender' and 'import org.transmart.logging.JsonLayout'.)
+     */
+    /*
+    appenders {
+        // default log directory is either the tomcat root directory or the
+        // current working directory.
+        def catalinaBase = System.getProperty('catalina.base') ?: '.'
+        def logDirectory = "${catalinaBase}/logs".toString()
+
+        // Use layout: JsonLayout(conversionPattern: '%m%n', singleLine: true) to get each message as a single line
+        // json the same way as ChildProcessAppender sends it.
+        appender new DailyRollingFileAppender(
+            name: 'fileAuditLogger',
+            datePattern: "'.'yyyy-MM-dd",
+            fileName: "${logDirectory}/audit.log",
+            layout: JsonLayout(conversionPattern:'%d %m%n')
+        )
+        // the default layout is a JsonLayout(conversionPattern: '%m%n, singleLine: true)
+        appender new ChildProcessAppender(
+                name: 'processAuditLogger',
+                command: ['/usr/bin/your/command/here', 'arg1', 'arg2']
+        )
+    }
+    trace fileAuditLogger: 'org.transmart.audit'
+    trace processAuditLogger: 'org.transmart.audit'
+    trace stdout: 'org.transmart.audit'
+    */
+
     environments {
         test {
             warn 'org.codehaus.groovy.grails.commons.spring'
@@ -218,32 +245,27 @@ log4j = {
             }
         }
     }
+
+    warn 'org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper'
 }
 
-// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
-
-/* remove this line
-// GSP settings
 grails {
-    views {
-        gsp {
-            encoding = 'UTF-8'
-            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
-            codecs {
-                expression = 'html' // escapes values inside null
-                scriptlet = 'none' // escapes output from scriptlets in GSPs
-                taglib = 'none' // escapes output from taglibs
-                staticparts = 'none' // escapes output from static template parts
-            }
-        }
-        // escapes all not-encoded output at final stage of outputting
-        filteringCodecForContentType {
-            //'text/html' = 'html'
+    cache {
+        enabled = true
+        ehcache {
+            ehcacheXmlLocation = 'classpath:ehcache.xml'
+            reloadable = false
         }
     }
 }
-remove this line */
 
-/*
-// MetaCore plugin
-com.thomsonreuters.transmart.metacoreAnalyticsEnable=true */
+// Added by the Spring Security OAuth2 Provider plugin:
+grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'org.transmart.oauth2.Client'
+grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'org.transmart.oauth2.AuthorizationCode'
+grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'org.transmart.oauth2.AccessToken'
+grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'org.transmart.oauth2.RefreshToken'
+
+// Disable LDAP by default to prevent authentication errors for installations without LDAP
+grails.plugin.springsecurity.ldap.active = false
+org.transmart.security.ldap.mappedUsernameProperty = 'username'
+org.transmart.security.ldap.inheritPassword = true

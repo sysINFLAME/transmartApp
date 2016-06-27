@@ -59,6 +59,7 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
                         }
                         //`this` is used inside function `dropOntoVariableSelection` function
                         target.dropOntoVariableSelection = dropOntoVariableSelection
+                        jQuery(target.el.dom).find('input[name=download_dt]').prop('checked', true);
                         return target.dropOntoVariableSelection(source, e, data);
                     };
                 };
@@ -351,7 +352,7 @@ DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
     outStr += ' name="file_type" ' + (file.patientsNumber < 1 || file.exporters.length < 2 ? 'disabled' : '') +'>';
     if(file.exporters) {
         file.exporters.each(function (exporter) {
-            outStr += '<option value="{subset: ' + subset + ', dataTypeId: ' + dataTypeId + ', fileType: ' + exporter.format + '}">' + exporter.format + '</option>';
+            outStr += '<option value="{subset: ' + subset + ', dataTypeId: \'' + dataTypeId + '\', fileType: \'' + exporter.format + '\'}">' + exporter.format + '</option>';
         });
     }
     outStr += '</select><br/>';
@@ -425,6 +426,11 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
  */
 DataExport.prototype.createDataExportJob = function (gridPanel) {
     var _this = this;
+    var subsetDataTypeFiles = jQuery("input[name=download_dt]:checked");
+    if (subsetDataTypeFiles.length < 1) {
+        alert('Please select the check boxes for the data types to export.');
+        return
+    }
     Ext.Ajax.request({
         url: pageInfo.basePath + "/dataExport/createnewjob",
         method: 'POST',

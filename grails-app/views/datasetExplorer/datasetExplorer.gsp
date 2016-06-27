@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" %>
+<%@ page language="java" import="grails.converters.JSON" %>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -74,6 +75,8 @@
     <link rel="stylesheet" type="text/css" href="${resource(dir: 'css/jquery/ui', file: 'jquery-ui-1.9.1.custom.css')}">
     <link rel="stylesheet" type="text/css" href="${resource(dir: 'css/jquery/skin', file: 'ui.dynatree.css')}">
     <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'datasetExplorer.css')}">
+    <link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'folderManagement.css', plugin: 'folder-management')}">
+    <script type="text/javascript" src="${resource(dir:'js', file:'folderManagementDE.js', plugin: 'folder-management')}"></script>
 
     <!-- Adding these validation functions to get the Forest Plot to work. These might be able to be blended into the javascript object that controls the advanced workflow validation. -->
     <script type="text/javascript"
@@ -149,8 +152,6 @@
             basePath: pageInfo.basePath,
             hideAcrossTrialsPanel: '${grailsApplication.config.com.recomdata.datasetExplorer.hideAcrossTrialsPanel}',
             sampleExplorerEnabled: ${!grailsApplication.config.ui.tabs.sampleExplorer.hide},
-            metacoreAnalyticsEnabled: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreAnalyticsEnable}',
-            metacoreUrl: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreURL}',
             AnalysisHasBeenRun: false,
             ResultSetRegionParams: {},
             currentReportCodes: [],
@@ -158,7 +159,8 @@
             currentSubsetsStudy: '',
             isGridViewLoaded: false,
             galaxyEnabled: '${grailsApplication.config.com.galaxy.blend4j.galaxyEnabled}',
-            galaxyUrl: "${grailsApplication.config.com.galaxy.blend4j.galaxyURL}"
+            galaxyUrl: "${grailsApplication.config.com.galaxy.blend4j.galaxyURL}",
+            analysisTabExtensions: ${grailsApplication.mainContext.getBean('transmartExtensionsRegistry').analysisTabExtensions as JSON}
         };
         // initialize browser version variables; see http://www.quirksmode.org/js/detect.html
         BrowserDetect.init();

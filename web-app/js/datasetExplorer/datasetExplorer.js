@@ -643,6 +643,8 @@ Ext.onReady(function () {
     if (GLOBAL.workspaceEnabled) {
         resultsTabPanel.add(workspacePanel);
     }
+    GLOBAL.sampleExplorerEnabled = false;
+    console.log(GLOBAL.sampleExplorerEnabled);
     if (GLOBAL.sampleExplorerEnabled) {
         resultsTabPanel.add(sampleExplorerPanel);
     }

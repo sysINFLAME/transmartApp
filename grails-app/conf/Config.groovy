@@ -269,7 +269,7 @@ grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'org.tr
 grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'org.transmart.oauth2.RefreshToken'
 
 // Disable LDAP by default to prevent authentication errors for installations without LDAP
-grails.plugin.springsecurity.ldap.active = false
+grails.plugin.springsecurity.ldap.active = true
 org.transmart.security.ldap.mappedUsernameProperty = 'username'
 org.transmart.security.ldap.inheritPassword = true
 grails.plugin.springsecurity.kerberos.active = false

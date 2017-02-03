@@ -98,7 +98,7 @@
                                     <table style="border:0px; text-align:center; width:100%">
                                         <tr>
                                             <td style="width: 100px">
-                                                <label for='j_username' style="font-weight:bold">Username :</label>
+                                                <label for='j_username' style="font-weight:bold">Username:</label>
                                             </td>
                                             <td style="white-space:nowrap;" NOWRAP>
                                                 <input type='text' class='text_' name='j_username' id='j_username'
@@ -112,7 +112,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label for='j_password' style="font-weight:bold">Password :</label>
+                                                <label for='j_password' style="font-weight:bold">Password:</label>
                                             </td>
                                             <td>
                                                 <input type='password' class='text_' name='j_password' id='j_password'
@@ -121,7 +121,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label for='remember_me' style="font-weight:bold">Remember me :</label>
+                                                <label for='remember_me' style="font-weight:bold">Remember me:</label>
                                             </td>
                                             <td>
                                                 <input type='checkbox' class='chk' name='_spring_security_remember_me' id='remember_me' />

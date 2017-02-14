@@ -135,7 +135,7 @@ grails.project.dependency.resolution = {
 
         if (!dm) {
             //runtime ':smart-r:16.2-STABLE'
-            //compile ':rdc-rmodules:16.2'
+            compile ':rdc-rmodules:16.2'
             runtime ':transmart-core:16.2'
             compile ':transmart-gwas:16.2'
             compile ':transmart-gwas-plink:16.2'

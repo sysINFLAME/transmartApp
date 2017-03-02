@@ -59,6 +59,8 @@ grails.project.dependency.resolution = {
         runtime 'org.javassist:javassist:3.16.1-GA'
 
         compile 'org.transmartproject:transmart-core-api:16.2'
+        // jdk 8
+//	    compile group: 'org.springframework', name: 'springloaded', version: '1.2.5.RELEASE'
 
         compile 'antlr:antlr:2.7.7'
         compile 'net.sf.opencsv:opencsv:2.3'

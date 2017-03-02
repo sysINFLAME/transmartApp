@@ -244,7 +244,7 @@ log4j = {
             warn 'org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder' //info to show joined-subclass indo
 
             root {
-                info('stdout')
+                info('stdout') //info
             }
         }
     }

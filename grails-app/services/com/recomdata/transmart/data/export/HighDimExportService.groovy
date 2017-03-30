@@ -16,7 +16,7 @@ import org.transmartproject.export.HighDimExporter
 class HighDimExportService {
 
     final static List<String> META_FILE_HEADER = ['Attribute', 'Description']
-    private static final META_FILE_NAME = 'meta.tsv'
+    private static final META_FILE_NAME = 'meta.csv'
 
     final static List<String> SAMPLE_FILE_HEADER = ['Assay ID',
                                                     'Subject ID',
@@ -25,7 +25,7 @@ class HighDimExportService {
                                                     'Tissue Type',
                                                     'Platform ID',
                                                     'Sample Code']
-    private static final SAMPLES_FILE_NAME = 'samples.tsv'
+    private static final SAMPLES_FILE_NAME = 'samples.csv'
 
     final static List<String> PLATFORM_FILE_HEADER = ['Platform ID',
                                                     'Title',
@@ -33,7 +33,7 @@ class HighDimExportService {
                                                     'Organism',
                                                     'Marker Type',
                                                     'Annotation Date']
-    private static final PLATFORM_FILE_NAME = 'platform.tsv'
+    private static final PLATFORM_FILE_NAME = 'platform.csv'
 
     private final static char COLUMN_SEPARATOR = '\t' as char
 

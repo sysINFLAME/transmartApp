@@ -23,8 +23,8 @@ class ClinicalExportService {
     def ontologyTermTagsResourceService
     def conceptsResourceService
 
-    final static String DATA_FILE_NAME = 'data_clinical.tsv'
-    final static String META_FILE_NAME = 'meta.tsv'
+    final static String DATA_FILE_NAME = 'data_clinical.csv'
+    final static String META_FILE_NAME = 'meta.csv'
     final static String SUBJ_ID_TITLE = 'Subject ID'
     final static char COLUMN_SEPARATOR = '\t' as char
     final static List<String> META_FILE_HEADER = ['Variable', 'Attribute', 'Description']

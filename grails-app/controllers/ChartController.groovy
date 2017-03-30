@@ -219,12 +219,18 @@ class ChartController {
         request.session.setAttribute("gridtable", null);
 
         // We retrieve all our charts from our ChartService
+        //TODO FIXME @Baumjamin
         def subsets = chartService.computeChartsForSubsets(chartService.getSubsetsFromRequest(params))
-        def concepts = chartService.getConceptsForSubsets(subsets)
-        concepts.putAll(chartService.getHighDimensionalConceptsForSubsets(subsets))
-
+        if (grailsApplication.config.misc.showQueryAnalysis) {
+            println(grailsApplication.config.misc.showQueryAnalysis)
+            def concepts = chartService.getConceptsForSubsets(subsets)
+            concepts.putAll(chartService.getHighDimensionalConceptsForSubsets(subsets))
+            render(template: "summaryStatistics", model: [subsets: subsets, concepts: concepts])
+        }
         // Time to delivery !
-        render(template: "summaryStatistics", model: [subsets: subsets, concepts: concepts])
+       else {
+            render(template: "summaryStatistics", model: [subsets: subsets, concepts: null])
+        }
     }
 
     def analysisGrid = {

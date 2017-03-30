@@ -1861,17 +1861,20 @@ function isSubsetQueriesChanged(referenceQueries) {
 }
 
 function runQuery(subset, callback) {
+    console.log("subset")
+    console.log(subset)
     if (Ext.get('analysisPanelSubset1') === null) {
         // analysisPanel.body.update("<table border='1' width='100%' height='100%'><tr><td width='50%'><div id='analysisPanelSubset1'></div></td><td><div id='analysisPanelSubset2'></div></td></tr>");
     }
 
     var query = getQuery(subset)[0].outerHTML
-
+    console.log("QUERY")
+    console.log(query)
     // first subset
     if (setvaluewin.hidden) {
         queryPanel.el.mask('Getting subset ' + subset + '...', 'x-mask-loading');
     }
-        
+        console.log(pageInfo.basePath + "/queryTool/runQueryFromDefinition")
     Ext.Ajax.request({
         url: pageInfo.basePath + "/queryTool/runQueryFromDefinition",
         method: 'POST',

@@ -43,7 +43,7 @@ class ExportMetadataService {
 
     def getClinicalMetaData(Long resultInstanceId1, Long resultInstanceId2) {
         //The result instance id's are stored queries which we can use to get information from the i2b2 schema.
-        log.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId1)
+        log.debug('rID1 :: ' + resultInstanceId1 + ' :: rID2 :: ' + resultInstanceId2)
 
         //Retrieve the counts for each subset.
         [
@@ -192,11 +192,11 @@ class ExportMetadataService {
                 isHighDimensional: false,
 
                 subset1          : [
-                        exporters     : [[format: 'TSV', description: 'Tab separated file.']],
+                        exporters     : [[format: 'CSV', description: 'Tab separated file.']],
                         patientsNumber: clinicalData.subset1
                 ],
                 subset2          : [
-                        exporters     : [[format: 'TSV', description: 'Tab separated file.']],
+                        exporters     : [[format: 'CSV', description: 'Tab separated file.']],
                         patientsNumber: clinicalData.subset2
                 ],
         ]

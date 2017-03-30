@@ -92,7 +92,7 @@ class DataExportControllerTests {
                         hasEntry('isHighDimensional', false),
                         hasEntry(equalTo('subset1'), allOf(
                                 hasEntry(equalTo('exporters'), contains(allOf(
-                                        hasEntry('format', 'TSV'),
+                                        hasEntry('format', 'CSV'),
                                         hasEntry('description', 'Tab separated file.'),
                                 ))),
                                 hasEntry(equalTo('patientsNumber'), equalTo(3)),

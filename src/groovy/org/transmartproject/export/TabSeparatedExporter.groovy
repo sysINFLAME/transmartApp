@@ -46,7 +46,7 @@ class TabSeparatedExporter implements HighDimExporter {
 
     @Override
     public String getFormat() {
-        return "TSV"
+        return "CSV"
     }
 
     @Override

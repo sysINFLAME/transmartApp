@@ -72,7 +72,7 @@ class HighDimExportServiceTests {
                 exportOptions: [meta: false, samples: false, platform: false])
 
         assertThat files, contains(
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.tsv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.csv').toString())),
         )
 
         def dataFile = files[0]
@@ -100,7 +100,7 @@ class HighDimExportServiceTests {
                 exportOptions: [meta: false, samples: false, platform: false])
 
         assertThat files, contains(
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.tsv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.csv').toString())),
         )
 
         def dataFile = files[0]
@@ -129,8 +129,8 @@ class HighDimExportServiceTests {
                 exportOptions: [meta: true, samples: false, platform: false])
 
         assertThat files, containsInAnyOrder(
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.tsv').toString())),
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','meta.tsv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.csv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','meta.csv').toString())),
         )
 
         files.each { File file ->
@@ -138,7 +138,7 @@ class HighDimExportServiceTests {
             assertThat file.length(), greaterThan(0l)
         }
 
-        def metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.tsv' }
+        def metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.csv' }
 
         def metaTable = parseSepValTable(metaFile)
         assertThat metaTable, contains(
@@ -160,8 +160,8 @@ class HighDimExportServiceTests {
                 exportOptions: [meta: false, samples: true, platform: false])
 
         assertThat files, containsInAnyOrder(
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.tsv').toString())),
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','samples.tsv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.csv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','samples.csv').toString())),
         )
 
         files.each { File file ->
@@ -169,7 +169,7 @@ class HighDimExportServiceTests {
             assertThat file.length(), greaterThan(0l)
         }
 
-        def samplesFile = files.find { it.absolutePath.endsWith File.separator + 'samples.tsv' }
+        def samplesFile = files.find { it.absolutePath.endsWith File.separator + 'samples.csv' }
 
         def samplesTable = parseSepValTable(samplesFile)
         assertThat samplesTable, containsInAnyOrder(
@@ -193,8 +193,8 @@ class HighDimExportServiceTests {
                 exportOptions: [meta: false, samples: false, platform: true])
 
         assertThat files, containsInAnyOrder(
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.tsv').toString())),
-                hasProperty('absolutePath', endsWith(Paths.get('/bar','platform.tsv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','data_mrna.csv').toString())),
+                hasProperty('absolutePath', endsWith(Paths.get('/bar','platform.csv').toString())),
         )
 
         files.each { File file ->
@@ -202,7 +202,7 @@ class HighDimExportServiceTests {
             assertThat file.length(), greaterThan(0l)
         }
 
-        def platformFile = files.find { it.absolutePath.endsWith File.separator + 'platform.tsv' }
+        def platformFile = files.find { it.absolutePath.endsWith File.separator + 'platform.csv' }
 
         def platformTable = parseSepValTable(platformFile)
         assertThat platformTable, contains(

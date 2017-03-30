@@ -373,6 +373,7 @@ DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
 DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortData) {
     var _this = this;
     var data = [];
+    console.log(selectedCohortData)
     data.push(selectedCohortData);
 
     /**
@@ -392,6 +393,7 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
     };
 
     store.each(function (row) {
+        console.log(row)
         var this_data = [];
         this_data['dataTypeId'] = row.data.dataTypeId;
         this_data['dataTypeName'] = row.data.dataTypeName + _get_export_data_tip (row.data.subset1);

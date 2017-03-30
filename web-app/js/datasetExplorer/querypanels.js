@@ -206,22 +206,17 @@ function refillQueryPanels(subsets) {
             //This is dangerous, but time efficient
             var _panel = jQuery(this)
             var _panelDOM = jQuery(".panelModel", jQuery("#queryTable tr:last-of-type td")[parseInt(subset) - 1]).last()
-
             _panelDOM.find(".panelBoxListPlaceholder").hide()
-
             var _inversion = _panel.find("invert").text() == "1"
-
             if (_inversion)
                 _panelDOM.find("input[id^=panelExclude]").attr("checked", "checked")
-            _panelDOM.find(".panelRadio").buttonset("refresh")
-
+            //FIXME TODO
+            //_panelDOM.find(".panelRadio").buttonset("refresh")
             _panel.find("item").each(function () {
                 _panelDOM.find(".panelBoxList").append(getPanelItemFromConcept(getConceptFromQueryItem(this)))
             })
-
             appendQueryPanelInto(subset)
         })
-
         queryPanel.el.unmask()
         adjustPanelSize()
     })

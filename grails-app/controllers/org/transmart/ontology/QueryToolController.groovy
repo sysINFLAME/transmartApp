@@ -19,9 +19,12 @@ class QueryToolController {
      * The result is a JSON serialized QueryResult.
      */
     def runQueryFromDefinition() {
+
         QueryDefinition definition =
                 queryDefinitionXmlService.fromXml(request.reader)
         String username = currentUserBean.username
+        log.warn "definition"
+        log.warn definition.panels.toString()
 
         def result = queriesResourceAuthorizationDecorator.runQuery(
                 definition, username)

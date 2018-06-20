@@ -112,14 +112,15 @@ table.menuDetail th.menuVisited {
 }
 
 #search-categories {
-    font-size: 10px;
-    height: 24px;
+    font-size: 99%;
+    height: 20px;
     width: 130px;
 }
 
 #search-ac {
-    padding-top: 3px;
-    width: 135px;
+    padding: 2px;
+    height: 14px;
+    width: 160px;
 }
 
 .ui-autocomplete .ui-menu-item a {
@@ -146,10 +147,14 @@ table.menuDetail th.menuVisited {
 }
 
 #box-search, #program-explorer {
-	margin: 26px 8px 8px 8px;
-	border-radius: 8px;
-	border: #0000FF;
-	box-shadow: #DDD 11px 11px 8px -7px;
+    margin: 10px 8px 8px 8px;
+    border-radius: 8px;
+    border: #0000FF;
+    box-shadow: #DDD 11px 11px 8px -7px;
+}
+
+#box-search {
+    margin-bottom: 0px;
 }
 
 #active-search-div
@@ -173,6 +178,7 @@ table.menuDetail th.menuVisited {
 
 .boxtitle, #navigateTermsPanel .x-panel-header {
   height:27px;
+  line-height: 15px;
   overflow: hidden;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -242,7 +248,7 @@ table.menuDetail th.menuVisited {
 
 #title-filter{
   height:25px;
-  overflow: hide;  
+  overflow: hidden;
 }
 
 .title, #navigateTermsPanel .x-panel-header-text{
@@ -256,6 +262,7 @@ table.menuDetail th.menuVisited {
 }
 
 .greybutton {
+    color: #000055;
 	background-color: #F4F4F4;
 	border: 1px solid #DDD;
 	cursor: pointer;
@@ -284,18 +291,41 @@ table.menuDetail th.menuVisited {
 .greybutton.addanalysis { background-image: url('../images/addanalysis.png'); }
 .greybutton.close { background-image: url('../images/small_cross.png'); }
 .greybutton.deletefolder { background-image: url('../images/bin_closed.png'); }
+.greybutton.deleteprogram { background-image: url('../images/bin_closed.png'); }
+.greybutton.deletestudy { background-image: url('../images/bin_closed.png'); }
+.greybutton.uploadfiles { background-image: url('../images/text.png'); } 
 
 .greybutton.disabled {
-	cursor: normal;
+	cursor: default;
 	color: #AAA;
 }
 
 
 #filterbutton {
 	position: absolute;
-	right: 40px;
+	right: 50px;
 	bottom: 5px;
 	padding: 0px 4px;
+	height: 15px;
+	line-height: 15px;
+}
+
+#filterbutton img {
+	max-height: 10px;
+}
+
+#clearbutton {
+	position: absolute;
+	right: 10px;
+	bottom: 5px;
+	padding: 0px 4px;
+	height: 15px;
+	line-height: 15px;
+}
+
+#clearbutton a {
+	text-decoration: none;
+	color: #000055;
 }
 
 #cartbutton {
@@ -402,7 +432,7 @@ table.menuDetail th.menuVisited {
 #sidebartoggle {
 	position:absolute;
 	left:0px;
-	top: 29px;
+	top: 3px;
 	z-index: 999;
 	background-image: url('../images/lefttab-left.png');
 	width: 22px;
@@ -441,7 +471,6 @@ textarea#description, textarea#longDescription, input#description, input#longDes
 
 .overlay {
 	position: absolute;
-	z-index: 10000;	
 	border: 8px solid #DDDEE6;
 	border-radius: 16px;
 	box-shadow: #DDD 11px 11px 8px -7px;
@@ -498,6 +527,13 @@ textarea#description, textarea#longDescription, input#description, input#longDes
 	height: 80%;
 }
 
+#uploadFilesOverlay {
+  top: 10%;
+  left: 20%;
+  width: 60%;
+  height: 80%;
+} 
+
 #filter-browser {
 	font-size: 8pt;
 	font-family: Verdana, Arial, sans-serif;
@@ -549,7 +585,6 @@ textarea#description, textarea#longDescription, input#description, input#longDes
     padding: 4px;
     max-width: 90%;
     max-height: 90%;
-    z-index:2001;
 }
 
 /* hidden overlay div, display with visibility toggle (let window size to content)*/

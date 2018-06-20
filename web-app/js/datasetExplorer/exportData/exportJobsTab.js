@@ -1,24 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- * 
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- * 
- * This product includes software developed at Janssen Research & Development, LLC.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- *
- ******************************************************************/
-  
-
-
 function getExportJobs(tab)
 {
 	//TODO : point it to /asyncJob/getjobs : somehow the UI in "Export Jobs" tab seems to be not showing the list of jobs
@@ -26,7 +5,7 @@ function getExportJobs(tab)
 		url : pageInfo.basePath+'/asyncJob/getjobs',
 		root : 'jobs',
 		totalProperty : 'totalCount',
-		fields : ['name', 'status', 'runTime', 'startDate', 'viewerURL', 'querySummary']
+		fields : ['name', 'status', 'runTime', 'startDate', 'viewerURL', 'altViewerURL']
 	});
 	exportjobsstore.on('load', exportjobsstoreLoaded);
 	var myparams = Ext.urlEncode({jobType: 'DataExport', disableCaching: true});
@@ -61,7 +40,6 @@ function exportjobsstoreLoaded()
 		        		  return changedName;
 		              }
 		          },
-		          //TODO possibly rename querySummary to altViewerURL
 		          {name:'altViewerURL', header: "Query Summary", width: 120, sortable: false, dataIndex: 'altViewerURL'},
 		          {name:'status', header: "Status", width: 60, sortable: true, dataIndex: 'status'},
 		          {name:'runTime', header: "Run Time", width: 80, sortable: true, dataIndex: 'runTime', hidden: true},

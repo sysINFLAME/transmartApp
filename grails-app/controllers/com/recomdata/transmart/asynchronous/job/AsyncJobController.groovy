@@ -1,29 +1,11 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- *
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- *
- * This product includes software developed at Janssen Research & Development, LLC.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- ******************************************************************/
-
-
 package com.recomdata.transmart.asynchronous.job
 
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
 import grails.converters.JSON
 import org.json.JSONObject;
+import org.transmartproject.core.users.User
+import org.transmartproject.core.log.AccessLogEntryResource
 
 class AsyncJobController {
     def quartzScheduler
@@ -32,6 +14,11 @@ class AsyncJobController {
     def jobResultsService
     def dataSource
     def asyncJobService
+
+    AccessLogEntryResource accessLogService
+    def auditLogService
+    def studyIdService
+    User currentUserBean
 
     static String ASYNC_JOB_WHITE_SPACE_DEFAULT = "0";
     static String ASYNC_JOB_WHITE_SPACE_EMPTY = "";
@@ -51,15 +38,15 @@ class AsyncJobController {
      */
     def getjobbyname = {
 
-		println(params.jobName)
+        println(params.jobName)
 
-		def result = asyncJobService.getjobbyname(params.jobName)
+        def result = asyncJobService.getjobbyname(params.jobName)
 
-		response.setContentType("text/json")
-		response.outputStream << result?.toString()
-	}
+        response.setContentType("text/json")
+        response.outputStream << result?.toString()
+    }
 
-	/**
+    /**
      * Called to retrieve the job results (HTML) stored in the JOB_RESULTS field for Haploview and Survival Analysis
      */
     def getjobresults = {
@@ -69,7 +56,18 @@ class AsyncJobController {
     }
 
     def createnewjob = {
+
+        def studies = getStudyIds(params)
+        def workflow = getWorkflow(params)
+
         def result = asyncJobService.createnewjob(params)
+
+        auditLogService.report("Run advanced workflow", request,
+                               user: currentUserBean,
+                               study: studies,
+                               jobname: result.jobName,
+                               workflow: workflow
+                              )
 
         response.setContentType("text/json")
         response.outputStream << result?.toString()
@@ -109,7 +107,7 @@ class AsyncJobController {
      * Shows the job status window
      */
     def showJobStatus = {
-        render(view: "/genePattern/workflowStatus")
+        render(view: "/genePattern/workflowStatus", model: [:])
     }
 
     /**
@@ -155,5 +153,54 @@ class AsyncJobController {
         def wfstatus = session["workflowstatus"]
         wfstatus.setCancelled();
         render(wfstatus.jobStatusList as JSON)
+    }
+
+    def getWorkflow = {
+        if (params.jobType != null)
+            return params.jobType
+
+        if (params.analysisConstraints?.job_type != null)
+            return params.analysisConstraints.job_type
+
+        return "unknownWorkflow"
+    }
+
+    def getStudyIds = {
+        String concept_key
+        String concept_table
+
+        Set<String> studyIds = []
+
+        if (params.analysisConstraints != null) {
+            def analysisConstraints = params.analysisConstraints
+
+            def jsonAnalysisConstraints = JSON.parse(params.analysisConstraints)
+            if (jsonAnalysisConstraints.assayConstraints?.patient_set != null)
+                studyIds += studyIdService.getStudyIdsForQueries(jsonAnalysisConstraints.assayConstraints.patient_set);
+        }
+
+        // for concept paths we have to make sure they start with \\top node
+        // note the string is escaped so we are adding a double backslash at the start
+        if (params.independentVariable != null && params.independentVariable != "") {
+            concept_key = params.independentVariable.split("\\|")[0]
+            concept_table = concept_key.split("\\\\")[1]
+            studyIds += studyIdService.getStudyIdForConceptKey('\\\\' + concept_table + concept_key)
+        }
+
+        if (params.dependentVariable != null && params.dependentVariable != "") {
+            concept_key = params.dependentVariable.split("\\|")[0]
+            concept_table = concept_key.split("\\\\")[1]
+            studyIds += studyIdService.getStudyIdForConceptKey('\\\\' + concept_table + concept_key)
+        }
+
+        if (params.variablesConceptPaths != null && params.variablesConceptPaths != "") {
+            concept_key = params.variablesConceptPaths.split("\\|")[0]
+            concept_table = concept_key.split("\\\\")[1]
+            studyIds += studyIdService.getStudyIdForConceptKey('\\\\' + concept_table + concept_key)
+        }
+
+        List<String> studyIdList = studyIds as List
+        studyIdList.sort()
+        studyIdList.join(',')
     }
 }

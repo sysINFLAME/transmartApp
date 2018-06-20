@@ -1,31 +1,15 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- *
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- *
- * This product includes software developed at Janssen Research & Development, LLC.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
- *
- *
- ******************************************************************/
-
-
 package com.recomdata.asynchronous
 
 import com.recomdata.transmart.data.export.exception.DataNotFoundException
 import com.recomdata.transmart.data.export.util.FTPUtil
 import com.recomdata.transmart.data.export.util.ZipUtil
 import grails.util.Holders
+import groovy.util.logging.Log4j
+import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
+import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
 import org.quartz.Job
+import org.quartz.JobDetail
 import org.quartz.JobExecutionContext
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
@@ -41,6 +25,7 @@ import java.lang.reflect.UndeclaredThrowableException
  * @author MMcDuffie
  *
  */
+@Log4j
 class GenericJobExecutor implements Job {
 
     def ctx = Holders.grailsApplication.mainContext
@@ -89,16 +74,29 @@ class GenericJobExecutor implements Job {
     // --
 
     public void execute(JobExecutionContext jobExecutionContext) {
-        //We use the job detail class to get information about the job.
-        def jobDetail = jobExecutionContext.getJobDetail()
-
-        //Gather the jobs info.
-        jobName = jobDetail.getName()
-        jobDataMap = jobDetail.getJobDataMap()
+        def userInContext = jobExecutionContext.jobDetail.jobDataMap['userInContext']
 
         // put the user in context
         quartzSpringScope."${CurrentUserBeanProxyFactory.SUB_BEAN_QUARTZ}" =
-                jobDataMap["userInContext"]
+                userInContext
+
+        PersistenceContextInterceptor interceptor
+        try {
+            interceptor = Holders.applicationContext.persistenceInterceptor
+            interceptor.init()
+            doExecute(jobExecutionContext.jobDetail)
+        } finally {
+            // Thread will be reused, need to clear user in context
+            quartzSpringScope.clear()
+            interceptor.flush()
+            interceptor.destroy()
+        }
+    }
+
+    private void doExecute(JobDetail jobDetail) {
+        //Gather the jobs info.
+        jobName = jobDetail.getName()
+        jobDataMap = jobDetail.getJobDataMap()
 
         //Initialize
         init();
@@ -106,6 +104,10 @@ class GenericJobExecutor implements Job {
         //Initialize the jobTmpDirectory which will be used during bundling in ZipUtil
         jobTmpDirectory = tempFolderDirectory + File.separator + "${jobName}" + File.separator
         jobTmpDirectory = jobTmpDirectory.replace("\\", "\\\\")
+        if (new File(jobTmpDirectory).exists()) {
+            log.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
+            FileUtils.deleteDirectory(new File(jobTmpDirectory))
+        }
         jobTmpWorkingDirectory = jobTmpDirectory + "workingDirectory"
 
         //Try to make the working directory.
@@ -306,7 +308,7 @@ class GenericJobExecutor implements Job {
         new File(rOutputDirectory).mkdir()
 
         //Establish a connection to R Server.
-        RConnection c = new RConnection();
+        RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port);
 
         log.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
 
@@ -364,11 +366,15 @@ class GenericJobExecutor implements Job {
                     newError = new RserveException(c, "There was an error running the R script for your job. Please contact an administrator.");
                 }
 
+                c.close();
+
                 throw newError;
 
             }
 
         }
+
+        c.close();
     }
 
     /**
@@ -386,6 +392,10 @@ class GenericJobExecutor implements Job {
 
     def boolean isJobCancelled(jobName) {
         boolean jobCancelled = false
+
+        //if no job has been submitted, it cannot be cancelled
+        if (! jobName) return false
+
         //log.debug("Checking to see if the user cancelled the job")
         if (jobResultsService[jobName]["Status"] == "Cancelled") {
             log.warn("${jobName} has been cancelled")

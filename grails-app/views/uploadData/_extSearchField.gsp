@@ -5,9 +5,9 @@ jQuery(document).ready(function() {
 	jQuery("#" + escapedFieldName + "-input").autocomplete({
 		source: function(request, response) {
 		    jQuery.ajax({
-                url: '${createLink([action:searchAction,controller:searchController])}',
+                url: '${createLink([action: searchAction, controller: searchController])}',
 		        type: 'POST',
-		        data: {'term': request['term'], ${paramString?: "'prm':'prm'"}},
+		        data: {'term': request['term'], ${paramString ?: "'prm':'prm'"}},
                 success: function(responseText) { response(responseText) },
                 failure: function(xhr) { alert(xhr.responseText); response(responseText); }
 		    });
@@ -21,7 +21,7 @@ jQuery(document).ready(function() {
 			updateStudyTable(studyId);
 			return false;
 		}
-	}).data("autocomplete")._renderItem = function( ul, item ) {
+	}).data("ui-autocomplete")._renderItem = function( ul, item ) {
 		return jQuery('<li></li>')
 		  .data("item.autocomplete", item )
 		  .append('<a><span class="category-' + item.category.toLowerCase() + '">' + item.category + '&gt;</span>&nbsp;<b>' + item.keyword + '</b></a>')

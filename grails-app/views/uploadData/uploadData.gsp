@@ -1,21 +1,5 @@
-<!--
-  tranSMART - translational medicine data mart
-  
-  Copyright 2008-2012 Janssen Research & Development, LLC.
-  
-  This product includes software developed at Janssen Research & Development, LLC.
-  
-  This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
-  as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
-  1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
-  2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
-  
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
- 
--->
+<!DOCTYPE html>
+<g:logMsg>In uploadData.gsp</g:logMsg>
 
 <!DOCTYPE html>
 <html>
@@ -41,8 +25,9 @@
 	<![endif]-->
 		
 		<g:javascript library="prototype" />
-<script type="text/javascript" src="${resource(dir:'js/jQuery', file:'jquery-1.8.3.min.js')}"></script>
-<script type="text/javascript" src="${resource(dir:'js/jQuery', file:'jquery-ui.min.js')}"></script>
+<g:javascript library="jquery" />
+<r:require module="uploadDataTab" />
+<r:layoutResources/>
 <script type="text/javascript">$j = jQuery.noConflict();</script>
 <script type="text/javascript" src="${resource(dir:'js', file:'uploadData.js')}"></script>
 <script type="text/javascript" charset="utf-8">
@@ -59,9 +44,9 @@ jQuery("#sensitiveDesc").hide();
 jQuery("#sensitiveFlag").val('1');
 });
 
-var helpURL = '${grailsApplication.config.com.recomdata.searchtool.adminHelpURL}';
-var contact = '${grailsApplication.config.com.recomdata.searchtool.contactUs}';
-var appTitle = '${grailsApplication.config.com.recomdata.searchtool.appTitle}';
+var helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
+var contact = '${grailsApplication.config.com.recomdata.contactUs}';
+var appTitle = '${grailsApplication.config.com.recomdata.appTitle}';
 var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:meta name="environment.BUILD_ID"/>';
 
 <g:if test="${study}">
@@ -73,10 +58,9 @@ var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:me
 <!-- This implements the Help functionality -->
 <script type="text/javascript" src="${resource(dir:'js', file:'help/D2H_ctxt.js')}"></script>
 <script language="javascript">
-    helpURL = '${grailsApplication.config.com.recomdata.searchtool.adminHelpURL}';
+    helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
 </script>
 <!-- ************************************** -->
-<r:layoutResources/>
 </head>
 <body>
 <div id="header-div">
@@ -92,11 +76,11 @@ var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:me
                     Edit Metadata
                 </g:if>
                 <g:else>
-                    Upload Analysis Data
+                    Upload GWAS results
                 </g:else>
             </div>
             <div style="position: relative; text-align:right;">
-                <a class="button" href="mailto:${grailsApplication.config.com.recomdata.dataUpload.adminEmail}">Email administrator</a>
+                <a class="button" href="mailto:${grailsApplication.config.com.recomdata.adminEmail}">Email administrator</a>
                  <tmpl:/help/helpIcon id="1331"/>&nbsp;
                 <div class="uploadMessage">If you are unable to locate the relevant study, email the administrator by clicking the button above.</div>
             </div>
@@ -216,7 +200,7 @@ var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:me
 
             <div class="dataFormTitle" id="dataFormTitle2">Upload Data</div>
                 <div style="position: relative; text-align:right;">
-                    <a class="button" href="mailto:${grailsApplication.config.com.recomdata.dataUpload.adminEmail}">Email administrator</a>
+                    <a class="button" href="mailto:${grailsApplication.config.com.recomdata.adminEmail}">Email administrator</a>
                     <tmpl:/help/helpIcon id="1332"/>&nbsp;
                     <div class="uploadMessage">If you are unable to locate the relevant autocomplete fields, email the administrator by clicking the button above.</div>
                 </div>
@@ -242,9 +226,12 @@ var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:me
                                     <i>Upload should be a tab-delimited plain text file</i>
                                 </td>
                             </tr>
+                            <tr><td colspan="4">
+                                    <font color="Red">*</font>Required Field
+                            </td></tr>
 
                             <tr class="borderbottom bordertop">
-                                <td id="tagsLabel">
+                                <td id="tagsLabel"><font color="Red">*</font>
                                     Phenotype:
                                 </td>
                                 <td colspan="3">
@@ -425,19 +412,19 @@ var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:me
                             <span class="dynatree-no-connector">
 
                             </span>
-                            <a class="dynatree-title">Upload analysis data</a>
+                            <a class="dynatree-title">Upload GWAS results</a>
                         </span>
                     </li>
-                    %{--<li class="sidebarRadio" id="uploadFileRadio">--}%
-                        %{--<span class="dynatree-node dynatree-folder dynatree-exp-c dynatree-ico-cf">--}%
-                            %{--<span class="dynatree-no-connector"></span>--}%
-                            %{--<a class="dynatree-title">Upload file to Faceted Search</a>--}%
-                        %{--</span>--}%
-                    %{--</li>--}%
+                    <li class="sidebarRadio" id="uploadFileRadio">
+                        <span class="dynatree-node dynatree-folder dynatree-exp-c dynatree-ico-cf">
+                            <span class="dynatree-no-connector"></span>
+                            <a class="dynatree-title">Upload file to GWAS</a>
+                        </span>
+                    </li>
                     <li class="sidebarRadio" id="uploadFileDatasetExplorerRadio">
                         <span class="dynatree-node dynatree-folder dynatree-exp-c dynatree-ico-cf">
                             <span class="dynatree-no-connector"></span>
-                            <a class="dynatree-title">Upload file to Dataset Explorer</a>
+                            <a class="dynatree-title">Upload file to Analyze</a>
                         </span>
                     </li>
                 </ul>

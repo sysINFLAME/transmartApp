@@ -1,22 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- * 
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- * 
- * This product includes software developed at Janssen Research & Development, LLC.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- *
- ******************************************************************/
-
 //**************Start of functions to set global subset ids**************
 /**
  * 1. If the global subset ids are null call runAllQueries to populate them.
@@ -100,7 +81,7 @@ function gatherHighDimensionalDataSingleSubset(divId, currentSubsetId){
  * Determine if we are dealing with genotype or copy number
  */
 function determineHighDimVariableType(result){
-	var mobj=result.responseText.evalJSON();
+	var mobj=jQuery.parseJSON(result.responseText);
 	GLOBAL.HighDimDataType=mobj.markerType;
 }
 
@@ -112,7 +93,7 @@ function determineHighDimVariableType(result){
 function readCohortData(result, divId)
 {
 	//Get the JSON string we got from the server into a real JSON object.
-	var mobj=result.responseText.evalJSON();
+	var mobj=jQuery.parseJSON(result.responseText);
 
 	//If we failed to retrieve any test from the heatmap server call, we alert the user here. Otherwise, show the popup.
 	if(mobj.NoData && mobj.NoData == "true")
@@ -198,7 +179,8 @@ function runQueryForSubsetId(subset, callback, divId)
    callback();
    return;
    } */
-	var query = getCRCRequest(subset, "", divId);
+
+	var query = getQuery(subset).append(getQueryPanel(jQuery('#' + divId)))[0].outerHTML
 	// first subset
 	queryPanel.el.mask('Getting subset ' + subset + '...', 'x-mask-loading');
 	Ext.Ajax.request(
@@ -253,55 +235,6 @@ function runQueryForSubsetidSingleSubset(callback, divId){
     {
         resultsPanel.setBody("<div style='height:400px;width500px;overflow:auto;'>" + Ext.util.Format.htmlEncode(query) + "</div>");
     }
-}
-
-function getCRCRequest(subset, queryname, divId){
-	if(queryname=="" || queryname==undefined){
-		var d=new Date();
-		queryname=GLOBAL.Username+"'s Query at "+ d.toUTCString();
-		}
-	var query= '<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">\
-	                <query_name>'+queryname+'</query_name>\
-	                <specificity_scale>0</specificity_scale>';
-	
-	var qcd=Ext.get(divId);
-	
-	if(qcd.dom.childNodes.length>0)
-	{
-		query=query+getCRCRequestPanel(qcd.dom, 1);
-	}
-	
-	for(var i=1;i<=GLOBAL.NumOfQueryCriteriaGroups;i++)
-	{
-		var qcd=Ext.get("queryCriteriaDiv"+subset+'_'+i.toString());
-		if(qcd.dom.childNodes.length>0)
-		{
-		query=query+getCRCRequestPanel(qcd.dom, i);
-		}
-	}
-	
-	query=query+"</ns4:query_definition>";
-	return query;
-}
-
-function getCRCRequestSingleSubset(divId, queryname){
-	if(queryname=="" || queryname==undefined){
-		var d=new Date();
-		queryname=GLOBAL.Username+"'s Query at "+ d.toUTCString();
-		}
-	var query= '<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">\
-	                <query_name>'+queryname+'</query_name>\
-	                <specificity_scale>0</specificity_scale>';
-	
-	var qcd=Ext.get(divId);
-	
-	if(qcd.dom.childNodes.length>0)
-	{
-		query=query+getCRCRequestPanel(qcd.dom, 1);
-	}
-	
-	query=query+"</ns4:query_definition>";
-	return query;
 }
 
 //**************End of functions to set global subset ids**************
@@ -394,7 +327,7 @@ function createSelectionSummaryString(divId, idx, summaryString){
 	'<br> <b>Timepoint:</b> '+selectedTimepoint+
 	'<br>';
 	
-	return summaryString
+	return summaryString;
 }
 
 function clearHighDimDataSelections(divId){
@@ -436,7 +369,7 @@ function clearSummaryDisplay(divId){
 
 function multipleSubsets(){
 	var multipleSubsets=false; 
-	if(Ext.get('multipleSubsets') && (getQuerySummary(2)!="")){
+	if(Ext.get('multipleSubsets') && (getSubsetQuerySummary(2)!="")){
 		multipleSubsets = (Ext.get('multipleSubsets').dom.value=='true');
 	}
 	return multipleSubsets;
@@ -471,7 +404,7 @@ function toggleDataAssociationFields(extEle){
 
 		if(isProbesAggregationSupported()){
 			document.getElementById("divProbesAggregation").style.display="";
-			document.getElementById("divProbesAggregation").checked=false
+			document.getElementById("divProbesAggregation").checked=false;
 		}
 	}
 	
@@ -526,8 +459,8 @@ function isProbesAggregationSupported(){
 function loadHighDimensionalParameters(formParams)
 {
 	//These will tell tranSMART what data types we need to retrieve.
-	var mrnaData = false
-	var snpData = false
+	var mrnaData = false;
+	var snpData = false;
 
 	//Gene expression filters.
 	var fullGEXSampleType 	= "";

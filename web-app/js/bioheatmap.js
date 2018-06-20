@@ -1,23 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- * 
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- * 
- * This product includes software developed at Janssen Research & Development, LLC.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- *
- ******************************************************************/
-  
-
 /*
 **    Copyright (C) 2003-2008 Institute for Systems Biology
 **                            Seattle, Washington, USA.
@@ -224,7 +204,7 @@ org.systemsbiology.visualization.BioHeatMap = Class.create({
         } catch (e) {
         }
         if (!canvasObj || !canvasObj.name) { // Not in IE, then
-            canvasObj = document.createElement('canvas')
+            canvasObj = document.createElement('canvas');
         }
         this.containerElement.appendChild(canvasObj);
 
@@ -654,16 +634,16 @@ org.systemsbiology.visualization.BioHeatMap = Class.create({
                     yOffset = t.offsetTop + parseInt(t.style.borderTopWidth || 0);
                     yOffset -= t.scrollTop;
                     y -= yOffset;
-                    t = t.offsetParent
+                    t = t.offsetParent;
                 }
 
                 this._clickPosition = {x:x,y:y};
                 var point = {x:x,y:y};
-                bioHeatMap._onClickEvent(point)
+                bioHeatMap._onClickEvent(point);
                 return point;
             }
 
-        }
+        };
     },
 
 
@@ -707,7 +687,7 @@ if (!window.console || !console.firebug)
     window.console = {};
     for (var i = 0; i < names.length; ++i)
         window.console[names[i]] = function() {
-        }
+        };
 }
 
 
@@ -850,7 +830,7 @@ org.systemsbiology.visualization.DiscreteColorRange = Class.create({
         else if (rgbaColor.a > 1)
             newRgbaColor.a = 1;
         else
-            newRgbaColor.a = rgbaColor.a
+            newRgbaColor.a = rgbaColor.a;
         return newRgbaColor;
     },
 
@@ -1090,17 +1070,17 @@ CanvasTextFunctions.letters = {
 CanvasTextFunctions.letter = function (ch)
 {
     return CanvasTextFunctions.letters[ch];
-}
+};
 
 CanvasTextFunctions.ascent = function( font, size)
 {
     return size;
-}
+};
 
 CanvasTextFunctions.descent = function( font, size)
 {
     return 7.0*size/25.0;
-}
+};
 
 CanvasTextFunctions.measure = function( font, size, str)
 {
@@ -1112,7 +1092,7 @@ CanvasTextFunctions.measure = function( font, size, str)
 	if ( c) total += c.width * size / 25.0;
     }
     return total;
-}
+};
 
 CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
 {
@@ -1150,7 +1130,7 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     }
     ctx.restore();
     return total;
-}
+};
 
 CanvasTextFunctions.enable = function( ctx)
 {
@@ -1167,7 +1147,7 @@ CanvasTextFunctions.enable = function( ctx)
 	var w = CanvasTextFunctions.measure(font,size,text);
 	return CanvasTextFunctions.draw( ctx, font,size,x-w/2,y,text);
     };
-}
+};
 
 
 
@@ -1209,7 +1189,7 @@ CanvasTextFunctions.enable = function( ctx)
 // * Optimize. There is always room for speed improvements.
 
 // only add this code if we do not already have a canvas implementation
-var excanvas = function(canvas){if (arguments.length == 1) return canvas;}
+var excanvas = function(canvas){if (arguments.length == 1) return canvas;};
 if (!window.CanvasRenderingContext2D) {
 
 excanvas = function (canvasObject) {
@@ -1486,7 +1466,7 @@ excanvas = function (canvasObject) {
     this.element_ = el;
     this.arcScaleX_ = 1;
     this.arcScaleY_ = 1;
-  };
+  }
 
   var contextPrototype = CanvasRenderingContext2D_.prototype;
   contextPrototype.clearRect = function() {
@@ -1699,9 +1679,9 @@ excanvas = function (canvasObject) {
 
       vmlStr.push("padding:0 ", mr(max.x / Z), "px ", mr(max.y / Z),
                   "px 0;filter:progid:DXImageTransform.Microsoft.Matrix(",
-                  filter.join(""), ", sizingmethod='clip');")
+                  filter.join(""), ", sizingmethod='clip');");
     } else {
-      vmlStr.push("top:", mr(d.y / Z), "px;left:", mr(d.x / Z), "px;")
+      vmlStr.push("top:", mr(d.y / Z), "px;left:", mr(d.x / Z), "px;");
     }
 
     vmlStr.push(' ">' ,

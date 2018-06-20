@@ -1,23 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- * 
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- * 
- * This product includes software developed at Janssen Research & Development, LLC.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- *
- ******************************************************************/
-  
-
 function getSelectedAsCommaSeparatedList(ob)
  {
  var selected = new Array();
@@ -29,17 +9,17 @@ function getSelectedAsCommaSeparatedList(ob)
 
  		function sizeToFit(f)
 		{
-		   var d=f.contentDocument
+		   var d = f.contentDocument;
 		   if(d==null)
 		   {
-		    d=f.contentWindow.document
+		    d = f.contentWindow.document;
 		   }
-		   var cv=d.getElementById("CrystalViewer");
-		   if(cv==null){return}
-		   if(typeof(cv)!='undefined')
+		   var cv = d.getElementById("CrystalViewer");
+		   if(cv == null){return}
+		   if(typeof(cv) != 'undefined')
 		   {
-		   f.width=cv.clientWidth;
-		   f.height=cv.clientHeight;
+		   f.width = cv.clientWidth;
+		   f.height = cv.clientHeight;
 		  }
 	}
 
@@ -265,13 +245,6 @@ function createUserSearchBox3(ajaxurl, boxwidth){
     return search;
 }
 
-
-
-
-
-
-
-
 Ext.namespace('Recom.rc');
 Recom.rc.ComboBox = function(config) {
 
@@ -315,17 +288,17 @@ function highlightTextNodes(element, searchTerm) {
 
 Recom.rc.serializeFormElements = function(elements, form /* jquery el or undef */) {
     if (!form) {
-        form = jQuery(this).closest('form')
+        form = jQuery(this).closest('form');
         if (!form.length) {
             // if form is not set, search in the whole document
-            form = $(window.document);
+            form = jQuery(window.document);
         }
     }
     var data = {};
     elements.forEach(function(id) {
         var jQueryEl = form.find('#' + id);
         if (!jQueryEl.length) {
-            form = form.find('[name=' +  id + ']')
+            form = form.find('[name=' +  id + ']');
             if (!jQueryEl.length) {
                 console.error('Could not find element with id or name \'' +
                         id + '\' in form ' + form);
@@ -333,7 +306,7 @@ Recom.rc.serializeFormElements = function(elements, form /* jquery el or undef *
         }
 
         data[id] = jQueryEl.val();
-    })
+    });
 
     return jQuery.param(data, true);
-}
+};

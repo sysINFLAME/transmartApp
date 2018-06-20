@@ -14,7 +14,7 @@ var nodesBeforeSelect = new Array();
 // event to cause the onSelectEvent code to keep triggering itself.  So change this to false before any call to select() within the onSelect (the event
 // will still fire but is stopped immediately); and set this flag back to true at the end of the event so it can be triggered again.  
 var allowOnSelectEvent = true;
-
+var uploader;
 // Method to add the categories for the select box
 function addSelectCategories()	{
 	
@@ -38,8 +38,8 @@ function addSelectCategories()	{
 		}
 		
 		jQuery("#search-categories").html(jQuery("option", jQuery("#search-categories")).sort(function(a, b) { 
-	        return a.text == b.text ? 0 : a.text < b.text ? -1 : 1 
-	    }))
+	        return a.text == b.text ? 0 : a.text < b.text ? -1 : 1;
+	    }));
 		
 		jQuery("#allCategory").after(jQuery("<option></option>").attr("value", "text").text("Free Text"));
 		
@@ -87,14 +87,16 @@ function addSearchAutoComplete()	{
 		source: sourceURL,
 		minLength:1,
 		select: function(event, ui) {  
+		    if (ui.item != null && ui.item != "") {
 			searchParam={id:ui.item.id,display:ui.item.category,keyword:ui.item.label,category:ui.item.categoryId};
 			addSearchTerm(searchParam);
+		    }
 			
 			//If category is ALL, add this as free text as well
 			var category = jQuery("#search-categories").val();
-			return false;
+		    return false;
 		}
-	}).data("autocomplete")._renderItem = function( ul, item ) {
+	}).data("ui-autocomplete")._renderItem = function( ul, item ) {
 		var resulta = '<a><span class="category-' + item.category.toLowerCase() + '">' + item.category + '&gt;</span>&nbsp;<b>' + item.label + '</b>&nbsp;';
 		if (item.synonyms != null) {
 			resulta += (item.synonyms + '</a>');
@@ -124,8 +126,8 @@ function addSearchAutoComplete()	{
 			if (category == 'ALL') {category = 'text'; categoryText = 'Free Text';}
 			searchParam={id:val,display:categoryText,keyword:val,category:category};
 			addSearchTerm(searchParam);
-			return false;
 			jQuery('#search-ac').empty();
+			return false;
 		}
 	});
 	return false;
@@ -183,13 +185,13 @@ function showSearchTemplate()	{
 	var searchHTML = '';
 	var startATag = '&nbsp;<a id=\"';
 	var endATag = '\" class="term-remove" href="#" onclick="removeSearchTerm(this);">';
-	var imgTag = '<img alt="remove" src="' + crossImageURL + '"/></a>&nbsp;'
+	var imgTag = '<img alt="remove" src="' + crossImageURL + '"/></a>&nbsp;';
 	var firstItem = true;
 	var needsToggle = false;
 	var geneTerms = 0;
 	
 	var globalLogicOperator = "AND";
-	if (jQuery('#globaloperator').hasClass("or")) { globalLogicOperator = "OR" }
+	if (jQuery('#globaloperator').hasClass("or")) { globalLogicOperator = "OR"; }
 
 	// iterate through categories array and move all the "gene" categories together at the top 
 	var newCategories = new Array();
@@ -316,8 +318,8 @@ function showSearchResults(openInAnalyze, datasetExplorerPath)	{
 
 //Method to load the facet results in the search tree and populate search results panel
 function showFacetResults(openInAnalyze, datasetExplorerPath)	{
-	if(openInAnalyze==undefined){
-		openInAnalyze=false;
+	if(openInAnalyze == undefined){
+		openInAnalyze = false;
 	}
 	var globalLogicOperator = "AND";
 	if (jQuery('#globaloperator').hasClass("or")) { globalLogicOperator = "OR" }
@@ -362,7 +364,7 @@ function showFacetResults(openInAnalyze, datasetExplorerPath)	{
 		    //Get the operator for this category from the global arrays
 		    var operatorIndex = currentCategories.indexOf(fields[0]);
 		    var operator = currentSearchOperators[operatorIndex];
-		    if (operator == null) { operator = 'or' }
+		    if (operator == null) { operator = 'or'; }
 		    operators.push(operator);
 		    
 
@@ -497,7 +499,7 @@ function removeSearchTerm(ctrl)	{
 	});
 
 	// create flag to track if tree was updated
-	var treeUpdated = false
+	var treeUpdated = false;
 
 	// only refresh results if the tree was not updated (the onSelect also fires these event, so don't want to do 2x)
 	if (!treeUpdated) {
@@ -544,7 +546,7 @@ function updateNodeIndividualFacetCount(node, count) {
 	        node.data.facetCount = count;
 	    }
 	    else  {
-	    	node.data.facetCount = node.data.initialFacetCount
+	    	node.data.facetCount = node.data.initialFacetCount;
 	    }
 	    node.data.title = node.data.termName + " (" + node.data.facetCount + ")";	
 	}
@@ -582,8 +584,50 @@ function unselectFilterItem(id) {
 
 // ---
 
+function toggleSidebar() {
+    element = jQuery('#sidebar')[0] || jQuery('#westPanel')[0];
+    element = '#' + element.id;
+
+    var leftPointingArrow = (jQuery('#sidebartoggle').css('background-image').indexOf("-right") < 0);
+    var sidebarIsVisible = (jQuery(element + ':visible').size() > 0);
+    //console.log("toggleSidebar: leftPointingArrow = " + leftPointingArrow + ", sidebarIsVisible = " + sidebarIsVisible);
+
+    // This fixes problems with ExtJS in case of rapid consecutive clicks, double-click. JIRA TRANSREL-18.
+    if (leftPointingArrow != sidebarIsVisible) { // it is still fading
+    //    console.log("Too fast.")
+        return;
+    }
+
+    func = null;
+    if (typeof resizeAccordion == 'function') func = resizeAccordion;
+    else func = function () {
+        var panel = Ext.getCmp('westPanel');
+        if (panel != undefined) {
+            if (panel.hidden) {
+                panel.hidden = false;
+                panel.setVisible(true);
+            }
+            else {
+                panel.hidden = true;
+                panel.setVisible(false);
+            }
+            viewport.doLayout();
+        }
+    };
+    if (sidebarIsVisible) {
+        jQuery(element).fadeOut(500, func);
+        var bgimg = jQuery('#sidebartoggle').css('background-image').replace('-left', '-right');
+        jQuery('#sidebartoggle').css('background-image', bgimg);
+    }
+    else {
+        jQuery(element).fadeIn();
+        if (func) func(); //Not a callback here - resize as soon as it starts appearing.
+        var bgimg = jQuery('#sidebartoggle').css('background-image').replace('-right', '-left');
+        jQuery('#sidebartoggle').css('background-image', bgimg);
+    }
+}
+
 jQuery(document).ready(function() {
-	
 	jQuery('#sidebartoggle').click(function() {
 		toggleSidebar();
     });
@@ -629,9 +673,9 @@ jQuery(document).ready(function() {
 		jQuery(this).find('.foldericonwrapper').fadeOut(150);
 	});
 
-    jQuery('body').on('click', '.foldericon.add', function() {
+    jQuery('body').on('click', '.foldericon.addcart', function() {
 		var id = jQuery(this).attr('name');
-		jQuery(this).removeClass("foldericon").removeClass("add").removeClass("link").text("Added to cart");
+		jQuery(this).removeClass("foldericon").removeClass("addcart").removeClass("link").text("Added to cart");
 		jQuery('#cartcount').hide();
 		
 		jQuery.ajax({
@@ -647,11 +691,11 @@ jQuery(document).ready(function() {
 	});
 
     jQuery('body').on('click', '.foldericon.addall', function() {
-		var nameelements = jQuery(this).closest('table').find('.foldericon.add');
+		var nameelements = jQuery(this).closest('table').find('.foldericon.addcart');
 		var ids = [];
 		for (i = 0; i < nameelements.size(); i++) {
 			ids.push(jQuery(nameelements[i]).attr('name'));
-			jQuery(nameelements[i]).removeClass("foldericon").removeClass("add").removeClass("link").text("Added to cart");
+			jQuery(nameelements[i]).removeClass("foldericon").removeClass("addcart").removeClass("link").text("Added to cart");
 		}
 		
 		jQuery('#cartcount').hide();
@@ -668,7 +712,7 @@ jQuery(document).ready(function() {
 		});
 	});
     
-    jQuery('body').on('click', '.foldericon.delete', function() {
+    jQuery('body').on('click', '.foldericon.deletefile', function() {
 		var id = jQuery(this).attr('name');
 		
 		if (confirm("Are you sure you want to delete this file?")) {
@@ -733,10 +777,10 @@ jQuery(document).ready(function() {
     	else {
     		//For individual categories, alter this index of the current search operators, then redisplay
 		    if (jQuery(this).hasClass("or")) {
-		    	currentSearchOperators[jQuery(this).attr('name')] = 'and'
+		    	currentSearchOperators[jQuery(this).attr('name')] = 'and';
 		    }
 		    else {
-		    	currentSearchOperators[jQuery(this).attr('name')] = 'or'
+		    	currentSearchOperators[jQuery(this).attr('name')] = 'or';
 		    }
 		    showSearchTemplate();
 		    showSearchResults();
@@ -812,7 +856,7 @@ jQuery(document).ready(function() {
     	var id = jQuery(this).attr('name');
     	var parent = jQuery(this).data('parent');
     	
-    	if (confirm("Are you sure you want to delete this folder and the files and folders beneath it?")) {
+    	if (confirm("Are you sure you want to delete this folder and the files and folders below it?")) {
 			jQuery.ajax({
 				url:deleteFolderURL,
 				data: {id: id},
@@ -827,6 +871,86 @@ jQuery(document).ready(function() {
 				}
 			});
     	}
+	});
+	jQuery('#metadata-viewer').on('click', '.uploadfiles', function() {
+	    var id = jQuery(this).attr('name'); 
+	    jQuery('#uploadtitle').html("<p>Upload files into folder "+jQuery('#parentFolderName').val()+"</p>");
+	    jQuery('#parentFolderId').val(id);
+	    jQuery('#uploadFilesOverlay').fadeIn();
+	    if (jQuery('#existingfiles').val()!="yes"){
+	      jQuery.ajax({
+	        url:uploadFilesURL + "?",
+            data: {folderId: id},
+	        success: function(response) {
+	          jQuery('#uploadFiles').html(response).removeClass('ajaxloading');
+	          createUploader();
+	        },
+	        error: function(xhr) {
+	          alert(xhr);
+	        }
+	      });
+	    }else{
+            setUploderEndPoint(id);
+	    }
+	});
+	  
+	jQuery('body').on('click', '#closeupload', function() {
+	      jQuery('#uploadFilesOverlay').fadeOut();  
+	});
+
+	jQuery('#metadata-viewer').on('click', '.deletestudy', function () {
+
+		var id = jQuery(this).attr('name');
+		var parent = jQuery('#parentId').val();
+		if (confirm("Are you sure you want to delete this study?")) {
+			findChildByParent(id, function (hasChildren) {
+				if (hasChildren) {
+					if (!confirm("This study contains some elements below it. Are you sure?")) {
+						return;
+					}
+				}
+				jQuery.ajax({
+					url: deleteStudyURL,
+					data: {id: id},
+					success: function (response) {
+						updateFolder(parent);
+						showDetailDialog(parent);
+						jQuery('.result-folder-name').removeClass('selected');
+						jQuery('#result-folder-name-' + parent).addClass('selected');
+					},
+					error: function (xhr) {
+						alert(xhr.message);
+					}
+				});
+			})
+
+		}
+	});
+
+	jQuery('#metadata-viewer').on('click', '.deleteprogram', function () {
+
+		var id = jQuery(this).attr('name');
+		if (confirm("Are you sure you want to delete this program?")) {
+			findChildByParent(id, function (hasChildren) {
+				if (hasChildren) {
+					if (!confirm("This program contains some elements below it. Are you sure?")) {
+						return;
+					}
+				}
+				jQuery.ajax({
+					url: deleteProgramURL,
+					data: {id: id},
+					success: function (response) {
+						showSearchResults();
+						goWelcome();
+					},
+					error: function (xhr) {
+						alert(xhr.message);
+					}
+				});
+			})
+
+		}
 	});
 
 	jQuery('#metadata-viewer').on('click', '.addstudy', function() {
@@ -885,7 +1009,7 @@ jQuery(document).ready(function() {
 				row.remove();
 				jQuery('#cartcount').show().text(response);
 				updateExportCount();
-				jQuery('#metadata-viewer').find(".exportaddspan[name='" + id + "']").addClass("foldericon").addClass("add").addClass("link").text('Add to export');
+				jQuery('#metadata-viewer').find(".exportaddspan[name='" + id + "']").addClass("foldericon").addClass("addcart").addClass("link").text('Add to export');
 			},
 			error: function(xhr) {
 				jQuery('#cartcount').show();
@@ -901,7 +1025,7 @@ jQuery(document).ready(function() {
 			ids.push(jQuery(checkboxes[i]).attr('name'));
 		}
 
-		if (ids.size() == 0) {return false;}
+		if (ids.length == 0) {return false;}
 
 		window.location = exportURL + "?id=" + ids.join(',');
 		   
@@ -911,11 +1035,11 @@ jQuery(document).ready(function() {
 			url:exportRemoveURL,
 			data: {id: ids.join(',')},			
 			success: function(response) {
-				for(j=0; j<ids.size(); j++){
+				for(j=0; j<ids.length; j++){
 					jQuery(checkboxes[j]).closest("tr").remove();
 					jQuery('#cartcount').show().text(response);
 					updateExportCount();
-					jQuery('#metadata-viewer').find(".exportaddspan[name='" + ids[j] + "']").addClass("foldericon").addClass("add").addClass("link").text('Add to export');
+					jQuery('#metadata-viewer').find(".exportaddspan[name='" + ids[j] + "']").addClass("foldericon").addClass("addcart").addClass("link").text('Add to export');
 				}
 			},
 			error: function(xhr) {
@@ -1017,6 +1141,17 @@ jQuery(document).ready(function() {
 		showSearchResults();
 	}
 });
+function incrementeDocumentCount(folderId) {
+    var documentCount = jQuery('#folder-header-' + folderId + ' .document-count');
+    if (documentCount.size() > 0) {
+      var currentValue = documentCount.text();
+      documentCount.text(parseInt(currentValue) + 1);
+    }else{
+      jQuery('#folder-header-'+folderId).html(jQuery('#folder-header-'+folderId).html()+
+          '<tr><td class="foldertitle">'+
+      '<span class="result-document-count"><i>Documents (<span class="document-count">1</span>)</i></span></td></tr>');
+    }
+}
 
 function loadSearchFromSession() {
 	var sessionFilters = sessionSearch.split(",,,");
@@ -1038,7 +1173,7 @@ function loadSearchFromSession() {
 	
 	for (var i = 0; i < sessionFilters.length; i++) {
 		var item = sessionFilters[i];
-		if (item != null && item != "") {
+		if (item != undefined && item != "") {
 			var itemData = item.split("|");
 			var itemSearchData = itemData[1].split(";");
 			var searchParam = {id: itemSearchData[2], display: itemData[0], category: itemSearchData[0], keyword: itemSearchData[1]};
@@ -1127,4 +1262,130 @@ function displayResultsNumber(){
 jQuery.ajaxSetup({
 	cache: false
 });
+function createUploader() {
+    $fub = jQuery('#fine-uploader-basic');
+    uploader = new qq.FineUploaderBasic({
+      button: $fub[0],
+      multiple: true,
+      request: {
+        endpoint: uploadActionURL+'?parentId='+jQuery('#parentFolderId').val()
+      },
+      callbacks: {
+        onSubmit: function(id, fileName) {
+            var folderName = jQuery('#folderName').val();
+              
+            jQuery('#uploadtable').append('<tr id="file-' + id + '" class="alert" style="margin: 20px 0 0">'+
+                '<td id="parent">'+folderName+'</td>'+
+                '<td id="name">'+fileName+'</td>'+
+                '<td id="status">Submitting</td>'+
+                '<td id="progress"></td></tr>');
+        },
+        onUpload: function(id, fileName) {
+            jQuery('#file-' + id + " #name").html(fileName);
+            jQuery('#file-' + id + " #status").html('Initializing ');
+        },
+        onProgress: function(id, fileName, loaded, total) {
+          if (loaded < total) {
+            progress = Math.round(loaded / total * 100) + '% of ' + Math.round(total / 1024) + ' kB';
 
+            jQuery('#file-' + id + " #status").html('Uploading ');
+            jQuery('#file-' + id + " #progress").html(progress);
+          } else {
+              jQuery('#file-' + id + " #status").html('Saving');
+              jQuery('#file-' + id + " #progress").html('100%');
+          }
+        },
+        onComplete: function(id, fileName, responseJSON) {
+          if (responseJSON.success) {
+            jQuery('#file-' + id + " #status").html('File successfully uploaded ');
+              jQuery('#file-' + id + " #progress").html('');
+
+              var folderId=responseJSON.folderId;
+              incrementeDocumentCount(folderId);
+              
+              if(folderId == jQuery('#parentFolderId').val()){
+                jQuery('#metadata-viewer').empty().addClass('ajaxloading');
+                jQuery('#metadata-viewer').load(folderDetailsURL + '?id=' + folderId, {}, function() {
+                    jQuery('#metadata-viewer').removeClass('ajaxloading');
+                });
+              }
+          } else {
+              jQuery('#file-' + id + " #status").html('Error: '+responseJSON.error);
+                jQuery('#file-' + id + " #progress").html('');
+          }
+          
+        }
+      }
+    });
+}
+function createUploader() {
+    $fub = jQuery('#fine-uploader-basic');
+    uploader = new qq.FineUploaderBasic({
+      button: $fub[0],
+      multiple: true,
+      request: {
+        endpoint: uploadActionURL+'?parentId='+jQuery('#parentFolderId').val()
+      },
+      callbacks: {
+        onSubmit: function(id, fileName) {
+            var folderName = jQuery('#parentFolderName').val();
+
+            jQuery('#uploadtable').append('<tr id="file-' + id + '" class="alert" style="margin: 20px 0 0">'+
+                '<td id="parent">'+folderName+'</td>'+
+                '<td id="name">'+fileName+'</td>'+
+                '<td id="status">Submitting</td>'+
+                '<td id="progress"></td></tr>');
+        },
+        onUpload: function(id, fileName) {
+            jQuery('#file-' + id + " #name").html(fileName);
+            jQuery('#file-' + id + " #status").html('Initializing ');
+        },
+        onProgress: function(id, fileName, loaded, total) {
+          if (loaded < total) {
+            progress = Math.round(loaded / total * 100) + '% of ' + Math.round(total / 1024) + ' kB';
+
+            jQuery('#file-' + id + " #status").html('Uploading ');
+            jQuery('#file-' + id + " #progress").html(progress);
+          } else {
+              jQuery('#file-' + id + " #status").html('Saving');
+              jQuery('#file-' + id + " #progress").html('100%');
+          }
+        },
+        onComplete: function(id, fileName, responseJSON) {
+          if (responseJSON.success) {
+            jQuery('#file-' + id + " #status").html('File successfully uploaded ');
+              jQuery('#file-' + id + " #progress").html('');
+
+              var folderId=responseJSON.folderId;
+              incrementeDocumentCount(folderId);
+
+              if(folderId == jQuery('#parentFolderId').val()){
+                jQuery('#metadata-viewer').empty().addClass('ajaxloading');
+                jQuery('#metadata-viewer').load(folderDetailsURL + '?id=' + folderId, {}, function() {
+                    jQuery('#metadata-viewer').removeClass('ajaxloading');
+                });
+              }
+          } else {
+              jQuery('#file-' + id + " #status").html('Error: '+responseJSON.error);
+                jQuery('#file-' + id + " #progress").html('');
+          }
+        }
+      }
+    });
+}
+
+function setUploderEndPoint(id) {
+	uploader.setEndpoint(uploadActionURL+'?parentId='+id);
+}
+
+function findChildByParent(parent, callFunc){
+	var hasChildred = true
+	jQuery.ajax({
+		url: hasChildrenURL,
+		data: {id: parent},
+		success: function(response) {
+			hasChildred = response.result
+			callFunc(hasChildred);
+		}
+	});
+}

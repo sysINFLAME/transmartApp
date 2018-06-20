@@ -1,23 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- * 
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- * 
- * This product includes software developed at Janssen Research & Development, LLC.
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- *
- ******************************************************************/
-  
-
 function createMainTabPanel() {
 
     // create toolbar
@@ -336,7 +316,7 @@ function activateTab(tab) {
         
         var contextHelpVisibility = false;
         if(pageData.trial.analysisCount>0 || pageData.trial.count>0){
-        	contextHelpVisibility = true
+        	contextHelpVisibility = true;
         }
         setButtonVisibility("contextHelp", contextHelpVisibility);
         filterContextHelpId = (pageData.trial.analysisCount>0) ? "1027" : "1028";
@@ -346,16 +326,16 @@ function activateTab(tab) {
 
         // experiment views
         if(pageData.pretrial.count>0){
-            setButtonVisibility("studyview", true)
+            setButtonVisibility("studyview", true);
         } else {
-        	setButtonVisibility("studyview", false)
+        	setButtonVisibility("studyview", false);
         }
 
         // tea analysis view
         if(pageData.pretrial.mRNAAnalysisCount>0){
-            setButtonVisibility("tea", true)
+            setButtonVisibility("tea", true);
         } else {
-        	setButtonVisibility("tea", false)
+        	setButtonVisibility("tea", false);
         }
         setButtonVisibility("summary", false);
         setButtonVisibility("heatmap", false);
@@ -365,7 +345,7 @@ function activateTab(tab) {
         
         var contextHelpVisibility = false;
         if(pageData.pretrial.mRNAAnalysisCount>0 || pageData.pretrial.count>0){
-        	contextHelpVisibility = true
+        	contextHelpVisibility = true;
         }
         setButtonVisibility("contextHelp", contextHelpVisibility);
         filterContextHelpId = (pageData.pretrial.mRNAAnalysisCount>0) ? "1023" : "1023";
@@ -395,7 +375,7 @@ function activateTab(tab) {
         } else	{
         	setButtonVisibility("exportresnet", true);
         }
-        setButtonVisibility("studyview", false)
+        setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
         setButtonVisibility("contextHelp", true);
         filterContextHelpId="1042";
@@ -406,7 +386,7 @@ function activateTab(tab) {
         setButtonVisibility("heatmap", false);
         setButtonVisibility("exportsummary", false);
         setButtonVisibility("exportresnet", false);
-        setButtonVisibility("studyview", false)
+        setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
         setButtonVisibility("contextHelp", true);
         filterContextHelpId="1047";
@@ -417,7 +397,7 @@ function activateTab(tab) {
         setButtonVisibility("heatmap", false);
         setButtonVisibility("exportsummary", false);
         setButtonVisibility("exportresnet", false);
-        setButtonVisibility("studyview", false)
+        setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
         if (pageData.pictor.resultsUrl.length > 1980) {
             window.alert("Note: The length of the URL for the Pictor query has exceeded the maximum supported by Internet Explorer and some genes may have been excluded from the query.");
@@ -431,7 +411,7 @@ function activateTab(tab) {
         setButtonVisibility("heatmap", false);
         setButtonVisibility("exportsummary", false);
         setButtonVisibility("exportresnet", false);
-        setButtonVisibility("studyview", false)
+        setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
         setButtonVisibility("contextHelp", false);
         break;
@@ -442,7 +422,7 @@ function activateTab(tab) {
         setButtonVisibility("heatmap", false);
         setButtonVisibility("exportsummary", false);
         setButtonVisibility("exportresnet", false);
-        setButtonVisibility("studyview", false)
+        setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
         setButtonVisibility("contextHelp", false);
         break;
@@ -770,7 +750,7 @@ function selectJubilantPanel(index) {
 }
 
 function onItemCheck(item, checked){
-    ;
+    
 }
 
 function popupWindow(mylink, windowname) {

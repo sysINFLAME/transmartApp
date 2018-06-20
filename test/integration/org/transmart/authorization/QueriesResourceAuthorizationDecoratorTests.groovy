@@ -3,21 +3,20 @@ package org.transmart.authorization
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.test.mixin.TestMixin
 import grails.util.GrailsWebUtil
-import grails.util.Holders
 import org.junit.Before
 import org.junit.Test
-import org.springframework.web.context.WebApplicationContext
 import org.transmartproject.core.exceptions.AccessDeniedException
 import org.transmartproject.core.ontology.ConceptsResource
-import org.transmartproject.core.querytool.*
+import org.transmartproject.core.querytool.Item
+import org.transmartproject.core.querytool.Panel
+import org.transmartproject.core.querytool.QueryDefinition
+import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
 import org.transmartproject.db.user.AccessLevelTestData
 
 import static groovy.util.GroovyAssert.shouldFail
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.is
-import static org.hamcrest.Matchers.isA
-import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
+import static org.hamcrest.Matchers.*
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
 /**
@@ -26,13 +25,13 @@ import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.
 @TestMixin(RuleBasedIntegrationTestMixin)
 class QueriesResourceAuthorizationDecoratorTests {
 
-    AccessLevelTestData accessLevelTestData = new AccessLevelTestData()
+    AccessLevelTestData accessLevelTestData = AccessLevelTestData.createDefault()
 
     SpringSecurityService springSecurityService
 
     ConceptsResource conceptsResourceService
 
-    QueriesResource queriesResourceAuthorizationDecorator
+    def queriesResourceAuthorizationDecorator
 
     @Before
     void setUp() {
@@ -94,11 +93,6 @@ class QueriesResourceAuthorizationDecoratorTests {
         // second user is in group test_-201, which has access to study 2
         def user = accessLevelTestData.users[1]
 
-        QueryDefinition queryDefinition = new QueryDefinition('test-query', [
-                new Panel(
-                        items: [
-                                new Item(conceptKey: '\\\\i2b2 main\\foo\\study2\\')])])
-
         mockCurrentUser user.username, {
             shouldFail AccessDeniedException, {
                 queriesResourceAuthorizationDecorator.runQuery(
@@ -115,7 +109,7 @@ class QueriesResourceAuthorizationDecoratorTests {
         mockCurrentUser user.username, {
             def queryResult = queriesResourceAuthorizationDecorator.runQuery(
                     study2SampleDefinition, user.username)
-
+            assert queryResult, is(notNullValue())
         }
     }
 
@@ -131,11 +125,15 @@ class QueriesResourceAuthorizationDecoratorTests {
         mockCurrentUser userCreator.username, {
             queryResult = queriesResourceAuthorizationDecorator.runQuery(
                     study2SampleDefinition, userCreator.username)
-
-            assertThat queriesResourceAuthorizationDecorator.
-                    getQueryResultFromId(queryResult.id), is(queryResult)
         }
-     }
+
+        mockCurrentUser userAccessor.username, {
+            shouldFail AccessDeniedException, {
+                assertThat queriesResourceAuthorizationDecorator.
+                        getQueryResultFromId(queryResult.id), is(queryResult)
+            }
+        }
+    }
 
     @Test
     void testLegacyStatic() {
@@ -161,7 +159,7 @@ class QueriesResourceAuthorizationDecoratorTests {
         QueryResult queryResult
 
         mockCurrentUser userCreator.username, {
-             queryResult = queriesResourceAuthorizationDecorator.
+            queryResult = queriesResourceAuthorizationDecorator.
                     runQuery(study2SampleDefinition, userCreator.username)
         }
 
@@ -176,40 +174,9 @@ class QueriesResourceAuthorizationDecoratorTests {
         GrailsWebUtil.bindMockWebRequest()
 
         def proxyMetaClass = ProxyMetaClass.getInstance(SpringSecurityService)
-        proxyMetaClass.interceptor = new PropertyAccessInterceptor() {
-            Object beforeInvoke(Object object, String methodName, Object[] arguments) {}
-
-            Object afterInvoke(Object object,
-                               String methodName,
-                               Object[] arguments,
-                               Object result) {
-                if (methodName == 'isLoggedIn') {
-                    return true
-                }
-                throw new UnsupportedOperationException(
-                        "Unexpected method call: $methodName($arguments)")
-            }
-
-            boolean doInvoke() {
-                false
-            }
-
-            Object beforeGet(Object object, String property) {
-                if (property == 'principal') {
-                    return [username: username]
-                }
-                throw new UnsupportedOperationException(
-                        "Unexpected property requested: $property")
-            }
-
-            void beforeSet(Object object, String property, Object newValue) {
-                throw new UnsupportedOperationException(
-                        "Unexpected property setting requested: $property, " +
-                                "value $newValue")
-            }
-        }
-
-        proxyMetaClass.use(springSecurityService, closure)
+        proxyMetaClass.interceptor =
+                new SpringSecurityProxyMetaClassInterceptor(username: username)
+        proxyMetaClass.use springSecurityService, closure
     }
 
 }

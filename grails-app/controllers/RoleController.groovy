@@ -1,22 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- *
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- *
- * This product includes software developed at Janssen Research & Development, LLC.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- ******************************************************************/
-
 /**
  * $Id: RoleController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
  * @author $Author: mmcduffie $
@@ -35,7 +16,7 @@ class RoleController {
     def springSecurityService
 
     def index = {
-        redirect action: list, params: params
+        redirect action: "list", params: params
     }
 
     /**
@@ -55,11 +36,42 @@ class RoleController {
         def authority = Role.get(params.id)
         if (!authority) {
             flash.message = "Role not found with id $params.id"
-            redirect action: list
+            redirect action: "list"
             return
         }
+        def people = authority.people
+        if (params.sort) {
+            def sortFunction = {o1,o2 ->
+                def v1 = peopleFieldSelector(params.sort,o1)
+                def v2 = peopleFieldSelector(params.sort,o2)
+                v1.compareTo(v2)
+            }
+            if (params.order.equals("asc")) {
+                people = people.sort(sortFunction)
+            } else {
+                people = people.sort(sortFunction).reverse()
+            }
+        } else {
+            people = people.sort({it.id})
+        }
+        [authority: authority, sortedPeople: people]
+    }
 
-        [authority: authority]
+    def peopleFieldSelector(feildName,authUser) {
+        switch (feildName) {
+            case "id" :
+                return authUser.id
+            case "username" :
+                return authUser.username
+            case "userRealName" :
+                return authUser.userRealName
+            case "enabled" :
+                return authUser.enabled
+            case "description" :
+                return authUser.description
+            default :
+                return authUser.id
+        }
     }
 
     /**
@@ -69,14 +81,14 @@ class RoleController {
         def authority = Role.get(params.id)
         if (!authority) {
             flash.message = "Role not found with id $params.id"
-            redirect action: list
+            redirect action: "list"
             return
         }
 
         springSecurityService.deleteRole(authority)
 
         flash.message = "Role $params.id deleted."
-        redirect action: list
+        redirect action: "list"
     }
 
     /**
@@ -86,7 +98,7 @@ class RoleController {
         def authority = Role.get(params.id)
         if (!authority) {
             flash.message = "Role not found with id $params.id"
-            redirect action: list
+            redirect action: "list"
             return
         }
 
@@ -101,7 +113,7 @@ class RoleController {
         def authority = Role.get(params.id)
         if (!authority) {
             flash.message = "Role not found with id $params.id"
-            redirect action: edit, id: params.id
+            redirect action: "edit", id: params.id
             return
         }
 
@@ -115,7 +127,7 @@ class RoleController {
 
         if (springSecurityService.updateRole(authority, params)) {
             springSecurityService.clearCachedRequestmaps()
-            redirect action: show, id: authority.id
+            redirect action: "show", id: authority.id
         } else {
             render view: 'edit', model: [authority: authority]
         }
@@ -152,7 +164,7 @@ class RoleController {
         }
 
         if (role.save()) {
-            redirect action: show, id: role.id
+            redirect action: "show", id: role.id
         } else {
             render view: 'create', model: [authority: role]
         }

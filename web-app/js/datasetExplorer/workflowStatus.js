@@ -1,23 +1,3 @@
-/*************************************************************************
- * tranSMART - translational medicine data mart
- *
- * Copyright 2008-2012 Janssen Research & Development, LLC.
- *
- * This product includes software developed at Janssen Research & Development, LLC.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
- * 1.    You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
- * 2.    You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- ******************************************************************/
-
-
 var thisJobName = null;
 function setJobNameFromRun(jobNameFromRun) {
     thisJobName = jobNameFromRun;
@@ -42,8 +22,8 @@ function createWorkflowStatus(parentElem, noTitleBar) {
     destroyWorkflowStatus();
 
     var maskDiv = $j(document.createElement('div')).attr({id: 'mask'});
-    maskDiv.css('z-index', 10000);
-    $j('#dataAssociationBody').append(maskDiv);
+    maskDiv.css('z-index', 10);
+    $j('#dataAssociationPanel').append(maskDiv);
 
 
     //Add new modal-dialog
@@ -60,31 +40,30 @@ function createWorkflowStatus(parentElem, noTitleBar) {
     modalDialogDiv.append(progressTextDiv);
 
     parentElem.append(modalDialogDiv);
-    $j("#progress-img").attr('src', '../images/spinner.gif');
+    $j("#progress-img").attr('src', '/transmart/images/spinner.gif');
 
     $j("#mask").fadeTo(500, 0.25);
 
     var d = $j("#dialog-modal").dialog({
-        height: 130, minHeight: 130, maxHeight: 130, width: 300, minWidth: 250, maxWidth: 350, closeOnEscape: false, show: { effect: 'drop', direction: "up" }, hide: { effect: 'fade', duration: 200 }, dialogClass: 'dialog-modal', title: 'Workflow Status', position: {
-            my: 'left top',
-            at: 'center',
-            of: parentElem
+        height: 150, minHeight: 150, maxHeight: 150, width: 300, minWidth: 250, maxWidth: 350, resizable: false, closeOnEscape: false, show: { effect: 'drop', direction: "up" }, hide: { effect: 'fade', duration: 200 }, dialogClass: 'dialog-modal no-close', title: 'Workflow Status', position: {
+            my: 'center center',
+            at: 'center center',
+            of: $j("#dataAssociationPanel")
         }, buttons: {
             "Stop Analysis": cancelWorkflow
         }
         //To hide the header of the dialog
         , create: function (event, ui) {
-            if (noTitleBar) $j(".ui-widget-header", $(ui)).hide();
+            if (noTitleBar)
+                $j(".ui-widget-header", $j(event.target)).hide();
         }, close: function (event, ui) {
             $j("#mask").hide();
             $j("#mask").remove();
-            $j("#dialog-modal").dialog('destroy');
-            //$j('#mask').remove();
-        }, zIndex: 10001
-        //, modal: true
+            $j("#dialog-modal").dialog('close')
+        }
         , autoOpen: false
     });
-    d.parent('.ui-dialog').appendTo($j('#dataAssociationBody'));
+    d.parent('.ui-dialog').css('z-index', 100).appendTo($j('#dataAssociationPanel').parent());
     $j("#dialog-modal").dialog('open');
 
     $j("#progress-bar").progressbar({
@@ -99,7 +78,7 @@ function updateWorkflowStatus(jobStatusInfo) {
 
         if (jobStatusInfo.jobStatus == 'Error') {
             showWorkflowStatusError(jobStatusInfo);
-            $j('#progress-img').attr('src', '../images/remove.png');
+            $j('#progress-img').attr('src', '/transmart/images/remove.png');
             return;
         }
 
@@ -110,11 +89,11 @@ function updateWorkflowStatus(jobStatusInfo) {
         }
 
         $j('#progress-bar').progressbar('option', 'value', value);
-        $j('#progress-img').attr('src', '../images/spinner.gif');
+        $j('#progress-img').attr('src', '/transmart/images/spinner.gif');
         $j('#progress-status').html(jobStatusInfo.jobStatus);
 
         if (jobStatusInfo.jobStatus == 'Completed') {
-            $j('#progress-img').attr('src', '../images/green_check2.png');
+            $j('#progress-img').attr('src', '/transmart/images/green_check2.png');
             $j("#dialog-modal").dialog().dialog('close');
         }
     }
@@ -140,25 +119,32 @@ function showWorkflowStatusErrorDialog(jobStatusHeader, jobStatusMsg) {
     errorDialogDiv.html(jobStatusMsg);
     $j("#dialog-modal").parent().append(errorDialogDiv);
 
+    var maskDiv = $j(document.createElement('div')).attr({id: 'mask'});
+    maskDiv.css('z-index', 10);
+    $j('#dataAssociationPanel').append(maskDiv);
+    $j("#mask").fadeTo(500, 0.25);
+
     var ed = $j("#error-dialog-modal").dialog({
-        height: 100, minHeight: 90, maxHeight: 120, width: 300, minWidth: 250, maxWidth: 350, resizable: true, closeOnEscape: true, show: { effect: 'fade', duration: 200 }, hide: { effect: 'fade', duration: 200 }, dialogClass: 'dialog-modal', title: jobStatusHeader, position: {
-            my: 'left top',
-            at: 'center',
-            of: $j("#dialog-modal").parent()
-        }, create: function (event, ui) {
-            /*setTimeout(function(){
-             $j("#error-dialog-modal").dialog('close');
-             $j("#dialog-modal").dialog('close');
-             }, 10000);*/
+        height: 150, minHeight: 150, maxHeight: 150, width: 300, minWidth: 250, maxWidth: 350, resizable: false, closeOnEscape: true, show: { effect: 'fade', duration: 200 }, hide: { effect: 'fade', duration: 200 }, dialogClass: 'dialog-modal no-close', title: jobStatusHeader, position: {
+            my: 'center center',
+            at: 'center center',
+            of: $j("#dataAssociationPanel")
+        }, buttons: {
+            "OK": function (event, ui) {
+                $j("#mask").hide();
+                $j("#mask").remove();
+                $j("#error-dialog-modal").dialog('close');
+                $j("#dialog-modal").dialog('close');
+            }
+        }, close: function (event, ui) {
             $j("#mask").hide();
             $j("#mask").remove();
-        }, close: function (event, ui) {
-            $j("#error-dialog-modal").dialog().dialog('close');
-            $j("#dialog-modal").dialog().dialog('close');
-        }, zIndex: 10002, autoOpen: false
+            $j("#error-dialog-modal").dialog('close');
+            $j("#dialog-modal").dialog('close');
+        }, autoOpen: false
     });
 
-    ed.parent('.ui-dialog').appendTo($j('#dataAssociationBody'));
+    ed.parent('.ui-dialog').css('z-index', 150).appendTo($j('#dataAssociationPanel'));
     $j("#error-dialog-modal").dialog('open');
 }
 

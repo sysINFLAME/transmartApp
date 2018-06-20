@@ -1,4 +1,4 @@
-@CHARSET "ISO-8859-1";
+@CHARSET "UTF-8";
   	.conceptSelected {background:#eee}
 	.conceptUnselected {background:white}
 	.demoTable td {padding: 3px; font: 10pt arial;}
@@ -12,6 +12,16 @@
 
 .GVNullValues {
     color:#d3d3d3;
+}
+
+.conceptDistributionPlaceholder {
+    display: block;
+    padding: 0 !important;
+    background-color: transparent !important;
+    background-position: center !important;
+    background-size: 10% !important;
+    width: 245px;
+    height: 180px;
 }
 
 div.topall {
@@ -65,8 +75,10 @@ a.toplink1:hover{
 }
 
 .clearbutton{
-		background-image:url(../images/small_cross.png ) !important;
-	}
+    padding-left: 20px !important;
+    background-image:url(../images/small_cross.png ) !important;
+    background-position: 6px 50%;
+}
 .runbutton{
 	background-image:url(../images/runprog.png ) !important;
 	}
@@ -85,16 +97,42 @@ a.toplink1:hover{
 	}
 .valueicon{
 	background-image:url(../images/numeric.gif ) !important;
-	}
-.printbutton{
-	background-image:url(../images/printer.png ) !important;
-	}
-	
+}
+.alphaicon{
+	background-image:url(../images/alpha.gif ) !important;
+}
+.foldernumericicon{
+	background-image:url(../images/folder_numeric.png ) !important;
+	}	
+.modifierfoldericon{background-image:url(../images/modifierfolder.png) !important;}
+.modifiericon{background-image:url(../images/ONT_MODIFIER_leaf.gif) !important;}
+.printbutton{background-image:url(../images/printer.png ) !important;}
 .savebutton{
 	background-image:url(../images/disk.png ) !important;
-	}	
-	
-.jleafclass 
+	}
+
+.progress-spinner {
+    background: url(../images/spinner.gif) 0px 0px / 16px 16px no-repeat transparent;
+    display:inline-block;
+    height: 16px;
+    width: 16px;
+}
+
+.progress-error {
+    background: url(../images/remove.png) 0px 0px / 16px 16px no-repeat transparent;
+    display:inline-block;
+    height: 16px;
+    width: 16px;
+}
+
+.progress-completed {
+    background: url(../images/green_check2.png) 0px 0px / 16px 16px no-repeat transparent;
+    display:inline-block;
+    height: 16px;
+    width: 16px;
+}
+
+.jleafclass
 	a span {
 
     color: #33cc33;
@@ -145,12 +183,16 @@ a.button span {
 
  .ext-ie .x-form-text {position:static !important;}
 
-.x-tree-node-leaf .x-tree-node-icon{background-image:url(../images/alpha.gif);}
+.x-tree-node-leaf .x-tree-node-icon{background-image:url(../images/nonaccessible.gif);}
 
 div.analysis {
 	font-family: arial;
 	font-size: 8pt;
-	}
+	padding-bottom: 50px;
+}
+div.analysis div {
+	font-size: 8pt;
+}
 table.analysis {
 	border-width: 1px 1px 1px 1px;
 	border-spacing: 4px;
@@ -159,6 +201,7 @@ table.analysis {
 	border-collapse: collapse;
 	background-color: white;
 	font-family: arial;
+	font-size: 8pt !important;
 }
 table.analysis th {
 	border-width: 1px 1px 1px 1px;
@@ -180,16 +223,27 @@ table.analysis td {
 }
 
 div.analysistitle {
-	font-size: 12pt;
+	font-size: 12pt !important;
 	font-weight: bold;
 	font-family:arial;
+	padding-bottom: 20px;
+}
+
+div.analysissubtitle {
+	font-size: 10pt !important;
+	font-family:arial;
+	font-style: italic;
+	color: #7c7c7c;
+	padding-bottom: 5px;
+	margin-bottom: 15px;
+}
+
+div.smalltitle {
+	padding-bottom: 5px !important;
 }
 
 
 	.searchform {
-	font:12px tahoma, arial, helvetica, sans-serif;
-	}
-	.subsettable {
 	font:12px tahoma, arial, helvetica, sans-serif;
 	}
 .search-item {font:normal 11px tahoma, arial, helvetica, sans-serif;padding:3px 10px 3px 10px;border:1px solid #fff;border-bottom:1px solid #eeeeee;white-space:normal;color:#505050;}
@@ -410,7 +464,6 @@ padding: 1em;
 }
 
 #header {
-font: bold serif;
 position: absolute; top: 0; left: 0; 
 -fs-move-to-flow: "header";
 }
@@ -453,19 +506,17 @@ content: counter(pages);
 
 .flatbutton {
 	background-repeat: no-repeat;
-	background-position: 2px 50%;
 	font-family: Arial, sans-serif;
-	font-size: 9pt;
-	padding: 4px 4px 4px 20px;
+	font-size: 12px;
+	padding: 4px 4px 4px 4px;
 	border: 1px solid #CCC;
 	cursor: pointer;
 	border-radius: 2px;
 }
 
 .flatbutton:hover {
-	background: #F4F4F4;
+	background-color: #b2b2b2;
 	background-repeat: no-repeat;
-	background-position: 2px 50%;	
 }
 
 /* Overrides for ext CSS */
@@ -519,7 +570,11 @@ li.x-tab-strip-active {
 }
 
 .x-panel-body {
-	border: none;
+       border: none;
+       background-image:url('../images/local_logo.jpg') !important;
+       background-repeat: no-repeat !important;
+    background-position: 95% 95% !important;
+    background-attachment: fixed !important;
 }
 
 .x-tab-panel-body {
@@ -527,7 +582,7 @@ li.x-tab-strip-active {
 }
 
 #westPanel {
-	background-color: white;	
+	background-color: white;
 }
 
 .x-layout-split {
@@ -542,3 +597,26 @@ li.x-tab-strip-active {
 
 .x-grid3-row .conceptUnselected, .x-grid3-row .conceptSelected {padding: 0 0 5px 5px; font-size: .85em;}
 .data-export-filter-tip {color: #666; font-style: italic}
+
+
+.no-close .ui-dialog-titlebar-close {display: none }
+
+.modifierValueDialog .ui-dialog-titlebar {
+	padding: 0.2em;
+}
+
+.modifierValueDialog .ui-dialog-content {
+	width: 500px;
+}
+
+#divjobstatus {
+	padding: 10px;
+}
+
+#divjobstatus td {
+	line-height: 18px;
+}
+
+#divjobstatus img {
+	max-height: 15px;
+}

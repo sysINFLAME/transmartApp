@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 class RecomTagLib {
-def diseaseService
+    def diseaseService
 
     def createFileLink = { attrs ->
 
@@ -128,6 +128,11 @@ def diseaseService
             out << "</a>"
         } else if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith("_PUBMED_ID")) {
             out << "<a href=\"#\" onclick=\"var w=window.open('http://www.ncbi.nlm.nih.gov/pubmed/" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
+            out << tagValue.displayValue << "&nbsp;"
+            out << "<img alt=\"external link\" src=\"" << resource(dir: 'images', file: 'linkext7.gif') << "\"/>"
+            out << "</a>"
+        } else if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith("_DOI")) {
+            out << "<a href=\"#\" onclick=\"var w=window.open('http://doi.org/" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
             out << tagValue.displayValue << "&nbsp;"
             out << "<img alt=\"external link\" src=\"" << resource(dir: 'images', file: 'linkext7.gif') << "\"/>"
             out << "</a>"
@@ -335,21 +340,20 @@ def diseaseService
         out << "</th></tr></thead>"
     }
 
-    
-	def fieldDate = { attrs, body ->
-		
-		def bean = attrs["bean"]
-		def field = attrs["field"]
-		def format = attrs["format"]
-		
-		def date = bean."${field}"
-		if (date) {
-			out << (new SimpleDateFormat(format).format(date))
-		}
-		else {
-			out << "None"
-		}
-	}
+
+    def fieldDate = { attrs, body ->
+
+        def bean = attrs["bean"]
+        def field = attrs["field"]
+        def format = attrs["format"]
+
+        def date = bean."${field}"
+        if (date) {
+            out << (new SimpleDateFormat(format).format(date))
+        } else {
+            out << "None"
+        }
+    }
 
     def fieldBytes = { attrs, body ->
         def bean = attrs["bean"]
@@ -402,12 +406,10 @@ def diseaseService
         if (PluginManagerHolder.pluginManager.hasGrailsPlugin(name)) {
             if (yes) {
                 out << yes
-            }
-            else {
+            } else {
                 out << body()
             }
-        }
-        else if (no) {
+        } else if (no) {
             out << no
         }
     }

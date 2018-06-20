@@ -40,10 +40,47 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
 
             // check if view already have rows represent the number of records
             for (var i = 1; i <= _this.records.length; i++) {
+                var recordData = _this.records[i - 1].data;
                 var _rowEl = _this.getView().getRow(i);
-                rows.push(_rowEl)
+                rows.push(_rowEl);
                 var _dtgI = new Ext.dd.DropTarget(_rowEl, {ddGroup: 'makeQuery'});
-                _dtgI.notifyDrop = dropOntoVariableSelection;
+                var isWrongNode = function(rd, data) {
+                    return rd.subset1.ontologyTermKeys
+                        && rd.subset1.ontologyTermKeys.indexOf(data.node.id) < 0
+                        && rd.subset2.ontologyTermKeys
+                        && rd.subset2.ontologyTermKeys.indexOf(data.node.id) < 0
+                            //TODO We could check for folders
+                        || (data.node.attributes.visualattributes.indexOf('HIGH_DIMENSIONAL') >= 0 && rd.dataTypeId == 'CLINICAL');
+                };
+                var getDropHandler = function(target, rd) {
+                    return function (source, e, data) {
+                        if (isWrongNode(rd, data)) {
+                            return false;
+                        }
+                        //`this` is used inside function `dropOntoVariableSelection` function
+                        target.dropOntoVariableSelection = dropOntoVariableSelection
+                        jQuery(target.el.dom).find('input[name=download_dt]').prop('checked', true);
+                        return target.dropOntoVariableSelection(source, e, data);
+                    };
+                };
+                _dtgI.notifyDrop = getDropHandler(_dtgI, recordData);
+
+                var getEnterHandler = function(target, rd) {
+                    return function(dd, e, data) {
+                        if(target.overClass){
+                            target.el.addClass(target.overClass);
+                        }
+                        return isWrongNode(rd, data) ? target.dropNotAllowed : target.dropAllowed;
+                    };
+                };
+                _dtgI.notifyEnter = getEnterHandler(_dtgI, recordData);
+
+                var getOverHandler = function(target, rd) {
+                    return function(dd, e, data) {
+                        return isWrongNode(rd, data) ? target.dropNotAllowed : target.dropAllowed;
+                    };
+                };
+                _dtgI.notifyOver = getOverHandler(_dtgI, recordData);
             }
 
             // stop runner when it's already found the elements
@@ -54,14 +91,14 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
         },
 
         interval: 500 // repeat every 0.5 seconds
-    }
+    };
 
     // Need to have a task runner since there's no other way to retrieve
     // row elements after they're rendered.
 
     var runner = new Ext.util.TaskRunner();  // define a runner
     runner.start(checkTask); // start the task
-}
+};
 
 /**********************************************************************************************************************/
 
@@ -76,17 +113,18 @@ function getDatadata() {
 
     // load export metadata
     dataExport.exportMetaDataStore.load({
-            params: {result_instance_id1: GLOBAL.CurrentSubsetIDs[1], result_instance_id2: GLOBAL.CurrentSubsetIDs[2]},
-            scope: dataExport,
-            callback: dataExport.displayResult
+        params: {result_instance_id1: GLOBAL.CurrentSubsetIDs[1], result_instance_id2: GLOBAL.CurrentSubsetIDs[2]},
+        scope: dataExport,
+        callback: dataExport.displayResult
     });
 }
 
 /**
  *  Data Export Object
  * @constructor
+ * @param errorHandler function taking response status and message
  */
-var DataExport = function () {
+var DataExport = function() {
 
     this.records = null;
 
@@ -98,18 +136,38 @@ var DataExport = function () {
      * @private
      */
     var _getExportMetadataStore = function () {
-        return new Ext.data.JsonStore({
+        var ret = new Ext.data.JsonStore({
             url : pageInfo.basePath+'/dataExport/getMetaData',
             root : 'exportMetaData',
             fields : ['subsetId1', 'subsetName1', 'subset1', 'subsetId2', 'subsetName2', 'subset2', 'dataTypeId',
-                'dataTypeName', 'metadataExists']
+                'dataTypeName']
         });
-    }
+        ret.proxy.addListener('loadexception', function(dummy, dummy2, response) {
+            if (response.status != 200) {
+                var responseText,
+                    parsedResponseText;
+                responseText = response.responseText;
+                try {
+                    parsedResponseText = JSON.parse(responseText);
+                    if (parsedResponseText.message) {
+                        responseText = parsedResponseText.message;
+                    }
+                } catch (syntaxError) {}
+                exportListFetchErrorHandler(response.status, responseText);
+            }
+        });
+        return ret;
+    };
+
+    var exportListFetchErrorHandler = function(status, text) {
+        Ext.Msg.alert('Status', "Error fetching export metadata.<br/>Status " +
+        status + "<br/>Message: " + text);
+    };
 
     // let's create export metadata json store
     this.exportMetaDataStore = _getExportMetadataStore();
 
-}
+};
 
 /**
  * Display data to be exported
@@ -140,13 +198,13 @@ DataExport.prototype.displayResult = function (records, options, success) {
                             tooltip:'Click for Data Export help',
                             iconCls: "contextHelpBtn",
                             handler: function(event, toolEl, panel){
-                                D2H_ShowHelp("1456",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+                                D2H_ShowHelp("1312",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
                             }
                         }
                     )]
             }
         );
-    }
+    };
 
     /**
      * Get data types grid panel component
@@ -165,13 +223,14 @@ DataExport.prototype.displayResult = function (records, options, success) {
             store: newStore,
             columns: columns,
             title: "Instructions: <br>" +
-                "1. Select the check boxes to indicate the data types and file formats that are " +
-                "desired for export. <br>" +
-                "2. Optionally you can filter the data by dragging and dropping some " +
-                "criteria onto each data type row.<br> " +
-                "3. Click on the \"Export Data\" button at the bottom of the screen to " +
-                "initiate an asynchronous data download job.  <br>" +
-                "4. To download your data navigate to the \"Export Jobs\" tab.",
+            "1. Select the check boxes for the data types and file formats that are " +
+            "desired for export. <br>" +
+            "2. Optionally you can filter the data by dragging and dropping some " +
+            "criteria onto each data type row.<br> " +
+            "3. Click on the \"Export Data\" button at the bottom of the screen to " +
+            "initiate an asynchronous data download job.  <br>" +
+            "4. To download your data navigate to the \"Export Jobs\" tab. <br>" +
+            "Note: <i>Metadata will be downloaded in a separate file.</i>",
             viewConfig:	{
                 forceFit : true,
                 emptyText : "No rows to display"
@@ -191,7 +250,7 @@ DataExport.prototype.displayResult = function (records, options, success) {
         });
 
         return _grid;
-    }
+    };
 
     // Display data when success and records contains data
     if (success && (_this.records.length > 0)) {
@@ -200,8 +259,8 @@ DataExport.prototype.displayResult = function (records, options, success) {
 
         _selectedCohortData['dataTypeId'] = '';
         _selectedCohortData['dataTypeName'] = 'Selected Cohort';
-        _selectedCohortData['subset1'] = getQuerySummary(1);
-        _selectedCohortData['subset2'] = getQuerySummary(2);
+        _selectedCohortData['subset1'] = getSubsetQuerySummary(1);
+        _selectedCohortData['subset2'] = getSubsetQuerySummary(2);
 
         var _columns = _this.prepareColumnModel(_this.exportMetaDataStore, _selectedCohortData);
         var _newStore = _this.prepareNewStore(_this.exportMetaDataStore, _columns, _selectedCohortData);
@@ -210,7 +269,10 @@ DataExport.prototype.displayResult = function (records, options, success) {
         _dataTypesGridPanel.records = _this.records;
         _dataTypesGridPanel.on("afterrender", _dataTypesGridPanel.dropZonesChecker);
 
-        // add gridPanel to the main panel
+        var prevDataGridPanel = analysisDataExportPanel.findById(_dataTypesGridPanel.id);
+        if(prevDataGridPanel) {
+            analysisDataExportPanel.remove(prevDataGridPanel);
+        }
         analysisDataExportPanel.add(_dataTypesGridPanel);
         analysisDataExportPanel.doLayout();
 
@@ -219,7 +281,7 @@ DataExport.prototype.displayResult = function (records, options, success) {
     }
     // unmask data export panel
     analysisDataExportPanel.body.unmask();
-}
+};
 
 /**
  *
@@ -257,75 +319,49 @@ DataExport.prototype.prepareColumnModel = function (store, selectedCohortData) {
     });
 
     return columns;
-}
+};
 
 /**
  *
  * @param files
  * @param subset
  * @param dataTypeId
- * @param metadataExists
  * @returns {string}
  */
-DataExport.prototype.prepareOutString = function (files, subset, dataTypeId, metadataExists) {
+DataExport.prototype.prepareOutString = function (file, subset, dataTypeId) {
     var outStr = '';
     var dataCountExists = false;
     var _this = this;
 
-    files.each(function (file) {
+    if (!dataCountExists) dataCountExists = true;
+    outStr += _this.createSelectBoxHtml(file, subset, dataTypeId);
 
-        if (!file.platforms) {
-            if (!dataCountExists) dataCountExists = true;
-            outStr += _this.createSelectBoxHtml(file, subset, dataTypeId)
-        } else {
-            if (file.platforms.length > 0) {
-                file.platforms.each(function (platform) {
-                    if (platform.fileDataCount > 0) {
-                        dataCountExists = true;
-                        outStr += _this.createSelectBoxHtml(file, subset, dataTypeId, platform)
-                    }
-                });
-            } else {
-                outStr += file.dataFormat + ' is not available. ';
-                outStr += '<br/><br/>'
-            }
-        }
-
-    });
-
-    if (dataCountExists && metadataExists)
-        outStr += 'Metadata will be downloaded in a separate file.';
     return outStr;
-}
+};
 
 /**
  *
  * @param file
  * @param subset
  * @param dataTypeId
- * @param platform
  * @returns {string|*}
  */
-DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId, platform) {
+DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
     outStr = '';
-    if (platform) {
-        outStr += file.dataFormat + ' is available for </br/>' + platform.gplTitle + ": " + platform.fileDataCount + ' patients';
-        outStr += '<br/> Export (' + file.fileType + ')&nbsp;&nbsp;';
-        outStr += '<input type="checkbox" name="SubsetDataTypeFileType"';
-        outStr += ' value="' + subset + '_' + dataTypeId + '_' + file.fileType + '_' + platform.gplId + '"';
-        outStr += ' id="' + subset + '_' + dataTypeId + '_' + file.fileType + '_' + platform.gplId + '"';
-        outStr += ' /><br/><br/>';
-    } else {
-        outStr += file.dataFormat + ' is available for ' + file.fileDataCount + ' patients';
-        outStr += '<br/> Export (' + file.fileType + ')&nbsp;&nbsp;';
-        outStr += '<input type="checkbox" name="SubsetDataTypeFileType"';
-        outStr += ' value="' + subset + '_' + dataTypeId + '_' + file.fileType + '"';
-        outStr += ' id="' + subset + '_' + dataTypeId + '_' + file.fileType + '"';
-        outStr += ' /><br/><br/>';
+    outStr +=  '<strong>' + file.patientsNumber + '</strong> patient' + (file.patientsNumber > 1 ? 's' : '');
+    //TODO Show simple label if there is just one file format possible
+    outStr += '<br/><input type="checkbox" id="' + subset + '_' + dataTypeId + '" name="download_dt" ' + (file.patientsNumber < 1 ? 'disabled' : '') +' />';
+    outStr += '&nbsp;<select id="file_type_' + subset + '_' + dataTypeId + '"';
+    outStr += ' name="file_type" ' + (file.patientsNumber < 1 || file.exporters.length < 2 ? 'disabled' : '') +'>';
+    if(file.exporters) {
+        jQuery.each(file.exporters, function (index, exporter) {
+            outStr += '<option value="{subset: ' + subset + ', dataTypeId: \'' + dataTypeId + '\', fileType: \'' + exporter.format + '\'}">' + exporter.format + '</option>';
+        })
     }
+    outStr += '</select><br/>';
 
-    return outStr
-}
+    return outStr;
+};
 
 /**
  *
@@ -336,16 +372,8 @@ DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId, p
  */
 DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortData) {
     var _this = this;
-
-    //Remove existing check-boxes
-    var subsetDataTypeFiles = document.getElementsByName('SubsetDataTypeFileType');
-
-    while (subsetDataTypeFiles.length >= 1) {
-        subsetDataTypeFiles[0].parentNode.removeChild(subsetDataTypeFiles[0])
-    }
-
-    var dataTypes;
     var data = [];
+    console.log(selectedCohortData)
     data.push(selectedCohortData);
 
     /**
@@ -353,37 +381,31 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
      * @returns {string}
      * @private
      */
-    var _get_export_data_tip = function (files) {
+    var _get_export_data_tip = function (file) {
         var _str_data_type = 'low dimensional';
 
-        files.each(function (file) {
-            if (file.platforms) {
-
-                file.platforms.each(function (platform) {
-                    if (platform.fileDataCount > 0) {
-                        _str_data_type = 'high dimensional';
-                    }
-                });
-            }
-        });
+        if (file.ontologyTermKeys) {
+            _str_data_type = 'high dimensional';
+        }
 
         return " <br><span class='data-export-filter-tip'>(Drag and drop " + _str_data_type
             + " nodes here to filter the exported data.)</span>";
-    }
+    };
 
     store.each(function (row) {
+        console.log(row)
         var this_data = [];
         this_data['dataTypeId'] = row.data.dataTypeId;
         this_data['dataTypeName'] = row.data.dataTypeName + _get_export_data_tip (row.data.subset1);
 
-        var outStr = _this.prepareOutString(row.data.subset1, row.data.subsetId1, row.data.dataTypeId, row.data.metadataExists);
+        var outStr = _this.prepareOutString(row.data.subset1, row.data.subsetId1, row.data.dataTypeId);
         this_data[row.data.subsetId1] = outStr;
 
         if (selectedCohortData['subset2'] != null && selectedCohortData['subset2'].length > 1) {
             // cohort string for subset 2
             this_data['dataTypeName'] = row.data.dataTypeName + _get_export_data_tip (row.data.subset2);
             // outstring for subset 2
-            outStr = _this.prepareOutString(row.data.subset2, row.data.subsetId2, row.data.dataTypeId, row.data.metadataExists);
+            outStr = _this.prepareOutString(row.data.subset2, row.data.subsetId2, row.data.dataTypeId);
             this_data[row.data.subsetId2] = outStr;
         }
 
@@ -401,7 +423,7 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
     myStore.loadData({subsets: data}, false);
 
     return myStore;
-}
+};
 
 /**
  * Create data export job
@@ -409,6 +431,11 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
  */
 DataExport.prototype.createDataExportJob = function (gridPanel) {
     var _this = this;
+    var subsetDataTypeFiles = jQuery("input[name=download_dt]:checked");
+    if (subsetDataTypeFiles.length < 1) {
+        alert('Please select the check boxes for the data types to export.');
+        return
+    }
     Ext.Ajax.request({
         url: pageInfo.basePath + "/dataExport/createnewjob",
         method: 'POST',
@@ -421,12 +448,12 @@ DataExport.prototype.createDataExportJob = function (gridPanel) {
         },
         timeout: '1800000',
         params: {
-            querySummary1: getQuerySummary(1),
-            querySummary2: getQuerySummary(2),
+            querySummary1: getSubsetQuerySummary(1),
+            querySummary2: getSubsetQuerySummary(2),
             analysis: "DataExport"
         }
     });
-}
+};
 
 /**
  * Get export parameters to be sent to the backend
@@ -455,7 +482,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
             }
         }
         return _returnVal;
-    } //
+    }; //
 
     /**
      * Check if a particular data type is selected
@@ -467,7 +494,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
     var _checkDataType = function (file, type) {
         var _typeRegex = new RegExp(type);
         return _typeRegex.test(file);
-    }
+    };
 
     /**
      * Get concept paths
@@ -485,7 +512,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
 
         return _concept_path_arr;
 
-    } //
+    }; //
 
     if (gridPanel.records.length > 0) {
 
@@ -523,7 +550,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
     }
 
     return params;
-}
+};
 
 /**
  * Run data export job
@@ -537,16 +564,18 @@ DataExport.prototype.runDataExportJob = function (result, gridPanel) {
     var messages = {
         cancelMsg: "Your Job has been cancelled.",
         backgroundMsg: "Your job has been put into background process. Please check the job status in " +
-            "the 'Export Jobs' tab."
-    }
+        "the 'Export Jobs' tab."
+    };
 
     showJobStatusWindow(result, messages);
 
-    var subsetDataTypeFiles = document.getElementsByName('SubsetDataTypeFileType');
+
+    var subsetDataTypeFiles = jQuery("input[name=download_dt]:checked");
     var selectedSubsetDataTypeFiles = [];
 
     for (var i = 0; i < subsetDataTypeFiles.length; i++) {
-        if (subsetDataTypeFiles[i].checked) selectedSubsetDataTypeFiles.push(subsetDataTypeFiles[i].value);
+        var selectedVal = jQuery("select[id=file_type_" + subsetDataTypeFiles[i].id + "] option:selected").val();
+        selectedSubsetDataTypeFiles.push(selectedVal);
     }
 
     if (window.console) {
@@ -561,15 +590,15 @@ DataExport.prototype.runDataExportJob = function (result, gridPanel) {
             method: 'POST',
             timeout: '1800000',
             params: Ext.urlEncode(
-            {
-                result_instance_id1: GLOBAL.CurrentSubsetIDs[1],
-                result_instance_id2: GLOBAL.CurrentSubsetIDs[2],
-                analysis: 'DataExport',
-                jobName: jobName,
-                selectedSubsetDataTypeFiles: selectedSubsetDataTypeFiles,
-                selection : JSON.stringify(_exportParams)
-            }) // or a URL encoded string
+                {
+                    result_instance_id1: GLOBAL.CurrentSubsetIDs[1],
+                    result_instance_id2: GLOBAL.CurrentSubsetIDs[2],
+                    analysis: 'DataExport',
+                    jobName: jobName,
+                    selectedSubsetDataTypeFiles: selectedSubsetDataTypeFiles,
+                    selection : JSON.stringify(_exportParams)
+                }) // or a URL encoded string
         });
 
     checkJobStatus(jobName);
-}
+};

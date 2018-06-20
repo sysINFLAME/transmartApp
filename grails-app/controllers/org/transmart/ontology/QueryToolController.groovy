@@ -1,19 +1,16 @@
 package org.transmart.ontology
 
 import grails.converters.JSON
-import org.transmart.authorization.CurrentUserBeanProxyFactory
+import org.transmart.marshallers.QueryResultConverter
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.core.users.User
-
-import javax.annotation.Resource
 
 class QueryToolController {
 
     def queryDefinitionXmlService
     def queriesResourceAuthorizationDecorator
-    @Resource(name = CurrentUserBeanProxyFactory.BEAN_BAME)
-    User currentUser
+    User currentUserBean
 
     /**
      * Creates a query definition and runs it. The input format is a subset
@@ -22,13 +19,16 @@ class QueryToolController {
      * The result is a JSON serialized QueryResult.
      */
     def runQueryFromDefinition() {
+
         QueryDefinition definition =
-            queryDefinitionXmlService.fromXml(request.reader)
-        String username = currentUser.username
+                queryDefinitionXmlService.fromXml(request.reader)
+        String username = currentUserBean.username
+        log.warn "definition"
+        log.warn definition.panels.toString()
 
         def result = queriesResourceAuthorizationDecorator.runQuery(
                 definition, username)
-        render result as JSON
+        render QueryResultConverter.convert(result) as JSON
     }
 
     /**

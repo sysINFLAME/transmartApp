@@ -12,6 +12,31 @@ html * {
     right: 0;
 }
 
+.tagBox {
+    clear: both;
+    width: 90%;
+    padding: 4px;
+}
+
+.tag {
+    background-color: #EEF;
+    border: 1px solid #AAF;
+    font-size: 8pt;
+    padding: 2px 2px 2px 16px;
+    margin: 2px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    line-height: 16pt;
+    cursor: pointer;
+    background-image: url('../images/clearsmall.png');
+    background-repeat: no-repeat;
+}
+
+.tag:hover {
+    background-color: #F0F0FF;
+    cursor: pointer;
+}
+
 body {
 	margin: 0;
 	padding:0;
@@ -195,7 +220,7 @@ td, th {
 }
 
 th {
-	background: #fff url(../images/skin/shadow.jpg);
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
     color: #666;
     font-size: 12px;
     font-weight: bold;
@@ -226,7 +251,7 @@ th.desc a {
 }
 
 .odd {
-    background: #e8e8e8;
+    background: #f4f4f4;
 }
 
 .even {
@@ -501,7 +526,8 @@ tr#gtb1odd1 {
 /* ---------------------------------------- End Generif */
 
 img {
-	border:
+	border:0;
+    outline: hidden;
 }
 
 a img {
@@ -844,6 +870,10 @@ select.jubselect {
     color:#ff0000;
 }
 
+.filter {
+    padding: 0px 10px 0px 10px;
+}
+
 .filtersBtn {
     background-image:url(../images/filter.gif ) !important;
     color:#ff0000;
@@ -954,7 +984,7 @@ select.jubselect {
 .search-item h3 {font:inherit;font-weight:bold;color:#202020;}
 .search-item span {font-size:10px;}
 
-.filter-item {font:normal 12px;color:#505050;}
+.filter-item {color:#505050;font-weight:normal; font-size: 12px}
 .filter-item-compound {color:#660099;font-weight:bold;} /* purple */
 .filter-item-disease {color:#cc0099;font-weight:bold;} /* magenta */
 .filter-item-gene {color:#468528;font-weight:bold;} /* green */

@@ -4,12 +4,16 @@ bin/
 .buildpath
 .classpath
 .settings
-.classpath
 .project
 .idea/
+.slcache/
 *.iml
 *.ipr
 *.iws
 *.log
+*.sw[op]
 .DS_Store
 System.out
+Thumbs.db
+/tomcat.8080/
+/out/
